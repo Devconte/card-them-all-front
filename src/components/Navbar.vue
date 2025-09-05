@@ -5,15 +5,12 @@
     </div>
 
     <div class="navbar-menu">
-      <router-link to="/" class="navbar-item">Accueil</router-link>
       <router-link to="/series" class="navbar-item">Séries</router-link>
-      <router-link to="/pokedex" class="navbar-item">Pokédex</router-link>
       <router-link to="/collection" class="navbar-item">Collection</router-link>
     </div>
 
     <div class="navbar-actions">
-      <router-link to="/login" class="btn btn-outline">Connexion</router-link>
-      <router-link to="/register" class="btn btn-primary">Inscription</router-link>
+      <button class="login-btn">Login / Inscription</button>
     </div>
   </nav>
 </template>
@@ -107,6 +104,24 @@
 
 .btn-primary:hover {
   background: #1e3d6f;
+}
+
+.login-btn {
+  background: #2b499b;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  background: #1e3d6f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(43, 73, 155, 0.3);
 }
 
 /* Responsive */

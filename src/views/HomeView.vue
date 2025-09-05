@@ -2,29 +2,40 @@
   <div class="home">
     <Navbar />
 
-    <h1>Bienvenue sur Card Them All !</h1>
+    <!-- Hero Section -->
+    <section class="hero">
+      <img src="/mega.png" alt="Mega Lucario" class="hero-bg-image" />
+    </section>
 
-    <div class="home-description">
-      <p>
-        Card Them All est un site de collection de cartes de jeu de société. Vous pouvez créer votre
-        collection, ajouter des cartes, et les échanger avec d'autres joueurs.
-      </p>
-    </div>
+    <!-- Main Content -->
+    <main class="main-content">
+      <h2 class="section-title">DERNIÈRES SORTIES</h2>
 
-    <div v-if="loading" class="loading">Chargement des séries...</div>
-
-    <div v-else-if="error" class="error">Erreur : {{ error }}</div>
-
-    <div v-else class="series-grid">
-      <div v-for="set in series" :key="set.id" class="serie-card">
-        <h3>{{ set.name }}</h3>
-        <p v-if="set.cardCount">Cartes: {{ set.cardCount.total }}</p>
-        <p v-if="set.releaseDate" class="release-date">
-          Sortie: {{ new Date(set.releaseDate).toLocaleDateString('fr-FR') }}
-        </p>
-        <p class="set-id">ID: {{ set.id }}</p>
+      <!-- Featured Card -->
+      <div class="featured-card">
+        <div class="featured-card-container">
+          <img src="/rivalitedestine.png" alt="Rivalités Destinées" class="featured-image" />
+          <h3 class="featured-title">RIVALITÉS DESTINÉES</h3>
+        </div>
       </div>
-    </div>
+
+      <!-- Cards Grid -->
+      <div v-if="loading" class="loading">Chargement des séries...</div>
+      <div v-else-if="error" class="error">Erreur : {{ error }}</div>
+      <div v-else class="cards-grid">
+        <div v-for="set in series" :key="set.id" class="card-item">
+          <img :src="getCardImage(set.name)" :alt="set.name" class="card-image" />
+          <h4 class="card-title">{{ set.name.toUpperCase() }}</h4>
+        </div>
+      </div>
+
+      <!-- View More Button -->
+      <div class="view-more">
+        <button class="view-more-btn">
+          <span class="plus-icon">+</span>
+        </button>
+      </div>
+    </main>
   </div>
 </template>
 
@@ -84,6 +95,21 @@ const fetchSeries = async () => {
   }
 }
 
+const getCardImage = (setName) => {
+  // Mapping des noms de sets vers les images disponibles
+  const imageMap = {
+    'Foudre Noire': '/foudrenoire.png',
+    'Flamme Blanche': '/foudreblanche.png',
+    'Rivalités Destinées': '/rivalitedestine.png',
+    'Aventures Ensemble': '/aventuresnesemble.png',
+    'Évolutions Prismatiques': '/évolution prismatique.png',
+    'Couronne Stellaire': '/couronnestelaire.png',
+    'Étincelles Déferlantes': '/foudreblanche.png',
+  }
+
+  return imageMap[setName] || '/logocard.png' // Image par défaut
+}
+
 onMounted(() => {
   fetchSeries()
 })
@@ -91,48 +117,243 @@ onMounted(() => {
 
 <style scoped>
 .home {
-  padding: 20px;
+  min-height: 100vh;
+  background: #f8f9fa;
 }
 
-.loading,
-.error {
-  text-align: center;
-  padding: 20px;
+/* Hero Section */
+.hero {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.series-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+.hero-bg-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Main Content */
+.main-content {
+  padding: 4rem 2rem;
   max-width: 1200px;
+  margin: 0 auto;
+  background: #f8f9fa;
+  position: relative;
+}
+
+.main-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 20px,
+    rgba(255, 192, 203, 0.1) 20px,
+    rgba(255, 192, 203, 0.1) 21px
+  );
+  pointer-events: none;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2b499b;
+  margin: 0 0 3rem 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Featured Card */
+.featured-card {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.featured-card-container {
+  display: inline-block;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(43, 73, 155, 0.2);
+  border: 4px solid #facf19;
+}
+
+.featured-image {
+  width: 100%;
+  max-width: 500px;
+  height: 300px;
+  object-fit: cover;
+  border: none;
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+.featured-image:hover {
+  transform: scale(1.02);
+}
+
+.featured-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  background: #2b499b;
+  margin: 0;
+  padding: 1rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  border-radius: 0 0 8px 8px;
+}
+
+/* Cards Grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 3rem;
+  max-width: 900px;
   margin-left: auto;
   margin-right: auto;
 }
 
-.serie-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
+.card-item {
   text-align: center;
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
   background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(43, 73, 155, 0.15);
 }
 
-.serie-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.card-item:hover {
+  transform: translateY(-5px);
 }
 
-.set-id {
-  font-size: 0.8em;
-  color: #666;
-  margin-top: 10px;
+.card-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border: none;
+  transition: all 0.3s ease;
+  flex: 1;
 }
 
-.release-date {
-  font-size: 0.9em;
-  color: #2c5aa0;
-  font-weight: 500;
-  margin: 5px 0;
+.card-item:hover .card-image {
+  box-shadow: 0 8px 24px rgba(43, 73, 155, 0.3);
+  border-color: #facf19;
+  transform: scale(1.02);
+}
+
+.card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+  background: #2b499b;
+  margin: 0;
+  padding: 1rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* View More Button */
+.view-more {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.view-more-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #2b499b;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(43, 73, 155, 0.3);
+}
+
+.view-more-btn:hover {
+  background: #facf19;
+  color: #2b499b;
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(250, 207, 25, 0.4);
+}
+
+.plus-icon {
+  display: block;
+  line-height: 1;
+}
+
+/* Loading and Error States */
+.loading,
+.error {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #2b499b;
+}
+
+.error {
+  color: #e74c3c;
+}
+
+/* Responsive Design */
+@media (min-width: 1200px) {
+  .hero {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .hero-bg-image {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .hero-bg-image {
+    max-height: 50vh;
+    width: 100%;
+    object-fit: contain;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .card-image {
+    height: 200px;
+  }
+
+  .featured-image {
+    height: 250px;
+  }
 }
 </style>
