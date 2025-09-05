@@ -1,0 +1,18 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: card-frontend-dev
+    ports:
+      - '8080:80'
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - card-network
+
+networks:
+  card-network:
+    external: true
+    name: card-them-all-back_card-network
