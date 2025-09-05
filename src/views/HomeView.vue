@@ -36,6 +36,8 @@
         </button>
       </div>
     </main>
+
+    <Footer />
   </div>
 </template>
 
@@ -43,6 +45,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import Navbar from '@/components/Navbar.vue'
+import Footer from '@/components/Footer.vue'
 
 const series = ref([])
 const loading = ref(false)
