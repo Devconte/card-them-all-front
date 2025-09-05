@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar">
+  <nav class="app-navbar">
     <div class="navbar-brand">
       <img src="/logocardlong.png" alt="Card Them All" class="logo" />
     </div>
@@ -20,7 +20,7 @@
 </script>
 
 <style scoped>
-.navbar {
+.app-navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -126,7 +126,7 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .navbar {
+  .app-navbar {
     flex-direction: column;
     gap: 1rem;
     padding: 1rem;
