@@ -4,8 +4,15 @@
   </div>
 </template>
 
-<script setup>
-// Pas besoin de script pour l'instant
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+
+onMounted(() => {
+  authStore.initializeAuth()
+})
 </script>
 
 <style>
