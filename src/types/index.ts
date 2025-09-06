@@ -1,15 +1,25 @@
-// Types pour les séries/sets
+// Types pour les séries/sets (basés sur la structure backend)
 export interface Serie {
   id: string
   name: string
-  releaseDate: string
-  block?: string
+  logo?: string | null
+  symbol?: string | null
+  cardCount?: {
+    total: number
+    official: number
+  }
 }
 
 export interface Set {
   id: string
   name: string
-  releaseDate: string
+  logo?: string | null
+  symbol?: string | null
+  releaseDate?: string | null
+  cardCount?: {
+    total: number
+    official: number
+  }
   serie?: Serie
 }
 
