@@ -1,11 +1,13 @@
 <template>
   <nav class="app-navbar">
     <div class="navbar-brand">
-      <img src="/logocardlong.png" alt="Card Them All" class="logo" />
+      <router-link to="/" class="logo-link">
+        <img src="/logocardlong.png" alt="Card Them All" class="logo" />
+      </router-link>
     </div>
 
     <div class="navbar-menu">
-      <router-link to="/series" class="navbar-item">Séries</router-link>
+      <router-link to="/sets" class="navbar-item">Sets</router-link>
       <router-link to="/collection" class="navbar-item">Collection</router-link>
     </div>
 
@@ -36,9 +38,19 @@
   gap: 0.5rem;
 }
 
+.logo-link {
+  display: block;
+  text-decoration: none;
+}
+
 .logo {
   height: 100px;
   width: auto;
+  transition: transform 0.3s ease;
+}
+
+.logo-link:hover .logo {
+  transform: scale(1.05);
 }
 
 .navbar-brand h2 {

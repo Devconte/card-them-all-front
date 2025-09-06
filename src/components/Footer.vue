@@ -8,7 +8,7 @@
           <h3 class="footer-brand">CARD THEM ALL</h3>
         </div>
         <div class="footer-nav">
-          <router-link to="/series" class="footer-link">Séries</router-link>
+          <router-link to="/sets" class="footer-link">Sets</router-link>
           <router-link to="/collection" class="footer-link">Collection</router-link>
         </div>
       </div>

@@ -31,7 +31,7 @@
 
       <!-- View More Button -->
       <div class="view-more">
-        <button class="view-more-btn">
+        <button class="view-more-btn" @click="goToSets">
           <span class="plus-icon">+</span>
         </button>
       </div>
@@ -43,10 +43,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 import type { Set } from '@/types'
+
+const router = useRouter()
 
 const series = ref<Set[]>([])
 const loading = ref<boolean>(false)
@@ -112,6 +115,10 @@ const getCardImage = (setName: string): string => {
   }
 
   return imageMap[setName] || '/logocard.png' // Image par défaut
+}
+
+const goToSets = () => {
+  router.push('/sets')
 }
 
 onMounted(() => {
