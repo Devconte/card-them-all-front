@@ -318,10 +318,23 @@ onMounted(() => {
   letter-spacing: 0.5px;
 }
 
+.set-serie {
+  color: #2b499b;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 0.25rem 0;
+}
+
 .set-date {
   color: #666;
-  margin: 0;
+  margin: 0.25rem 0;
   font-size: 0.9rem;
+}
+
+.set-cards {
+  color: #888;
+  font-size: 0.8rem;
+  margin: 0.25rem 0 0 0;
 }
 
 /* Loading State */
