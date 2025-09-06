@@ -12,13 +12,25 @@
     </div>
 
     <div class="navbar-actions">
-      <button class="login-btn">Login / Inscription</button>
+      <!-- Si connecté -->
+      <div v-if="authStore.isAuthenticated" class="user-menu">
+        <span class="user-name">Bonjour {{ authStore.user?.name }}</span>
+        <button @click="authStore.logout" class="logout-btn">Déconnexion</button>
+      </div>
+
+      <!-- Si pas connecté -->
+      <div v-else class="auth-buttons">
+        <router-link to="/login" class="login-btn">Connexion</router-link>
+        <router-link to="/register" class="register-btn">Inscription</router-link>
+      </div>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
-// Pas besoin de script pour l'instant
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 </script>
 
 <style scoped>
@@ -118,22 +130,76 @@
   background: #1e3d6f;
 }
 
-.login-btn {
-  background: #2b499b;
+/* User menu */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-name {
+  color: #2b499b;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.logout-btn {
+  background: #e53e3e;
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   border-radius: 6px;
   font-weight: 600;
-  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.logout-btn:hover {
+  background: #c53030;
+  transform: translateY(-2px);
+}
+
+/* Auth buttons */
+.auth-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #2b499b 0%, #1e3a8a 100%);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-size: 0.9rem;
 }
 
 .login-btn:hover {
-  background: #1e3d6f;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(43, 73, 155, 0.3);
+  box-shadow: 0 4px 15px rgba(43, 73, 155, 0.4);
+}
+
+.register-btn {
+  background: linear-gradient(135deg, #facf19 0%, #f0b300 100%);
+  color: #2b499b;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.register-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(250, 207, 25, 0.4);
 }
 
 /* Responsive */
