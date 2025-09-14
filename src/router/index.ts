@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import SetView from '../views/SetView.vue'
+import SetDetailView from '../views/SetDetailView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 
@@ -16,6 +17,11 @@ const router = createRouter({
       path: '/sets',
       name: 'sets',
       component: SetView,
+    },
+    {
+      path: '/sets/:id',
+      name: 'set-detail',
+      component: SetDetailView,
     },
     {
       path: '/login',
