@@ -32,14 +32,14 @@
             <div class="filter-section">
               <h3 class="filter-title">Rareté</h3>
               <div class="filter-options">
-                <label v-for="rarity in rarities" :key="rarity" class="radio-option">
+                <label v-for="rarity in rarities" :key="rarity" class="checkbox-option">
                   <input
-                    type="radio"
+                    type="checkbox"
                     :value="rarity"
-                    v-model="selectedRarity"
-                    class="radio-input"
+                    v-model="selectedRarities"
+                    class="checkbox-input"
                   />
-                  <span class="radio-label">{{ rarity }}</span>
+                  <span class="checkbox-label">{{ rarity }}</span>
                 </label>
               </div>
             </div>
@@ -139,7 +139,7 @@ const authStore = useAuthStore()
 const loading = ref<boolean>(false)
 const set = ref<SetType | null>(null)
 const searchQuery = ref<string>('')
-const selectedRarity = ref<string>('')
+const selectedRarities = ref<string[]>([])
 
 // Computed from store
 const cards = computed(() => setCardsStore.getSetCards(route.params.id as string))
@@ -157,9 +157,9 @@ const filteredCards = computed(() => {
     )
   }
 
-  // Rarity filter
-  if (selectedRarity.value) {
-    filtered = filtered.filter((card) => card.rarity === selectedRarity.value)
+  // Rarity filter (multiple selection)
+  if (selectedRarities.value.length > 0) {
+    filtered = filtered.filter((card) => selectedRarities.value.includes(card.rarity))
   }
 
   return filtered
@@ -301,6 +301,37 @@ onMounted(() => {
   color: #2b499b;
   margin: 0 0 1rem 0;
   text-transform: uppercase;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.checkbox-option:hover {
+  background-color: #f5f5f5;
+}
+
+.checkbox-input {
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 15px;
+  color: #333;
+  cursor: pointer;
 }
 
 .search-input {
