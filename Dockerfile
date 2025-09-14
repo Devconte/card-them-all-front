@@ -1,5 +1,5 @@
 # Stage 1: Build the Vue.js application
-FROM node:20-alpine AS builder
+FROM --platform=linux/amd64 node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies (including dev for build)
-RUN npm install
+RUN rm -rf package-lock.json node_modules && npm install
 
 # Copy source code
 COPY . .
