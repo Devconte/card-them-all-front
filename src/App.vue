@@ -16,6 +16,9 @@ onMounted(() => {
 </script>
 
 <style>
+/* Import des polices */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600;700&family=Luckiest+Guy&display=swap');
+
 /* Police globale */
 * {
   font-family: 'Montserrat Alternates', sans-serif;

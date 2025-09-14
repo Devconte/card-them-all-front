@@ -81,7 +81,7 @@ const authStore = useAuthStore()
   text-decoration: none;
   color: #333;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 17px;
   padding: 0.5rem 1rem;
   border-radius: 4px;
   transition: all 0.2s;
@@ -140,7 +140,7 @@ const authStore = useAuthStore()
 .user-name {
   color: #2b499b;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 17px;
 }
 
 .logout-btn {
@@ -152,7 +152,7 @@ const authStore = useAuthStore()
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.9rem;
+  font-size: 17px;
 }
 
 .logout-btn:hover {
@@ -176,7 +176,7 @@ const authStore = useAuthStore()
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 17px;
 }
 
 .login-btn:hover {
@@ -194,7 +194,7 @@ const authStore = useAuthStore()
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 17px;
 }
 
 .register-btn:hover {

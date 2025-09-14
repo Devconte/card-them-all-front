@@ -9,13 +9,14 @@
       <div class="auth-content">
         <!-- Formulaire de connexion -->
         <div class="auth-form-section">
+          <!-- Logo en haut à gauche -->
+          <div class="auth-logo-top">
+            <img src="/logocardlong.png" alt="Card Them All" class="logo-image" />
+          </div>
+
           <div class="auth-form-card">
-            <div class="auth-header">
-              <div class="auth-logo">
-                <img src="/logocardlong.png" alt="Card Them All" class="logo-image" />
-              </div>
-              <h2>Connexion</h2>
-            </div>
+            <!-- Titre en haut à gauche du formulaire -->
+            <h2 class="auth-title">Connexion</h2>
 
             <form @submit.prevent="handleLogin" class="auth-form">
               <div class="form-group">
@@ -186,30 +187,26 @@ const handleLogin = async () => {
   max-width: 500px;
 }
 
-.auth-header {
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
-
-.auth-logo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 1.5rem;
+/* Logo en haut à gauche */
+.auth-logo-top {
+  position: absolute;
+  top: 6rem;
+  left: 4rem;
+  z-index: 2;
 }
 
 .logo-image {
-  width: 200px;
+  width: 150px;
   height: auto;
-  margin-bottom: 1rem;
 }
 
-.auth-header h2 {
-  font-family: 'Montserrat Alternates', sans-serif;
-  font-size: 1.6rem;
-  font-weight: 600;
+/* Titre du formulaire */
+.auth-title {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 35px;
   color: #333;
-  margin: 0;
+  margin: 0 0 2rem 0;
+  text-align: left;
 }
 
 .auth-form {
@@ -226,8 +223,8 @@ const handleLogin = async () => {
 
 .form-group label {
   color: #333;
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 400;
+  font-size: 17px;
   margin-bottom: 0.25rem;
 }
 
@@ -235,7 +232,8 @@ const handleLogin = async () => {
   padding: 1rem;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 17px;
+  font-weight: 400;
   background-color: #f9f9f9;
   transition: all 0.3s ease;
   font-family: 'Montserrat Alternates', sans-serif;
@@ -270,8 +268,8 @@ const handleLogin = async () => {
   border: none;
   padding: 1rem 2rem;
   border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 400;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: 'Montserrat Alternates', sans-serif;

@@ -25,7 +25,7 @@
       <div v-else class="cards-grid">
         <div v-for="set in series" :key="set.id" class="card-item">
           <img :src="getCardImage(set.name)" :alt="set.name" class="card-image" />
-          <h4 class="card-title">{{ set.name.toUpperCase() }}</h4>
+          <h4 class="card-title">{{ set.name }}</h4>
         </div>
       </div>
 
@@ -175,12 +175,12 @@ onMounted(() => {
 
 .section-title {
   text-align: center;
-  font-size: 2.5rem;
-  font-weight: 700;
   color: #2b499b;
   margin: 0 0 3rem 0;
   text-transform: uppercase;
   letter-spacing: 2px;
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 35px;
 }
 
 /* Featured Card */
@@ -214,7 +214,7 @@ onMounted(() => {
 }
 
 .featured-title {
-  font-size: 1.5rem;
+  font-size: 17px;
   font-weight: 700;
   color: white;
   background: #2b499b;
@@ -268,13 +268,12 @@ onMounted(() => {
 }
 
 .card-title {
-  font-size: 0.9rem;
+  font-size: 17px;
   font-weight: 600;
   color: white;
   background: #2b499b;
   margin: 0;
   padding: 1rem 0.5rem;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
   line-height: 1.3;
   text-align: center;

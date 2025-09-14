@@ -4,8 +4,7 @@
       <!-- Left Section - Logo and Navigation -->
       <div class="footer-left">
         <div class="footer-logo">
-          <img src="/logocard.png" alt="Card Them All" class="footer-logo-img" />
-          <h3 class="footer-brand">CARD THEM ALL</h3>
+          <img src="/logocardlong.png" alt="Card Them All" class="footer-logo-img" />
         </div>
         <div class="footer-nav">
           <router-link to="/sets" class="footer-link">Sets</router-link>
@@ -76,7 +75,7 @@
 }
 
 .footer-logo-img {
-  height: 40px;
+  height: 80px;
   width: auto;
 }
 
@@ -97,7 +96,7 @@
   color: #e8e8e8;
   text-decoration: none;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 15px;
   transition: color 0.3s ease;
   font-family: 'Montserrat Alternates', sans-serif;
 }
@@ -119,7 +118,7 @@
 
 .footer-copyright {
   color: #e8e8e8;
-  font-size: 0.85rem;
+  font-size: 15px;
   margin: 0;
   text-align: center;
   font-family: 'Montserrat Alternates', sans-serif;
@@ -138,7 +137,7 @@
 
 .footer-social-title {
   color: #e8e8e8;
-  font-size: 0.9rem;
+  font-size: 15px;
   font-weight: 600;
   margin: 0;
   font-family: 'Montserrat Alternates', sans-serif;
