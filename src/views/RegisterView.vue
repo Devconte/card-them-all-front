@@ -1,6 +1,9 @@
 <template>
   <div class="register-page">
-    <Navbar />
+    <!-- Bouton retour accueil -->
+    <div class="back-button">
+      <router-link to="/" class="back-link"> ← Retour à l'accueil </router-link>
+    </div>
 
     <div class="auth-container">
       <div class="auth-content">
@@ -9,8 +12,7 @@
           <div class="auth-form-card">
             <div class="auth-header">
               <div class="auth-logo">
-                <img src="/logocard.png" alt="Card Them All" class="logo-image" />
-                <h1>CARD THEM ALL</h1>
+                <img src="/logocardlong.png" alt="Card Them All" class="logo-image" />
               </div>
               <h2>Inscription</h2>
             </div>
@@ -104,8 +106,6 @@
         </div>
       </div>
     </div>
-
-    <Footer />
   </div>
 </template>
 
@@ -113,8 +113,6 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import Navbar from '@/components/Navbar.vue'
-import Footer from '@/components/Footer.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -166,42 +164,77 @@ const handleRegister = async () => {
 <style scoped>
 .register-page {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   background-color: #f8f9fa;
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+.back-button {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  z-index: 10;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #2b499b;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.back-link:hover {
+  background: #f0f4ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
 .auth-container {
-  flex-grow: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  min-height: calc(100vh - 140px);
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
 }
 
 .auth-content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  max-width: 1200px;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 0;
+  background: white;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;
+  max-width: 100%;
   width: 100%;
-  align-items: center;
+  min-height: 100vh;
 }
 
 .auth-form-section {
+  padding: 4rem 5rem;
+  background: white;
+  position: relative;
   display: flex;
+  align-items: center;
   justify-content: center;
+  min-height: 100vh;
 }
 
-.auth-form-card {
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  padding: 3rem;
-  width: 100%;
-  max-width: 450px;
-  position: relative;
+.auth-form-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image: repeating-linear-gradient(
     90deg,
     transparent,
@@ -209,6 +242,14 @@ const handleRegister = async () => {
     rgba(0, 0, 0, 0.02) 2px,
     rgba(0, 0, 0, 0.02) 4px
   );
+  pointer-events: none;
+}
+
+.auth-form-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 500px;
 }
 
 .auth-header {
@@ -224,23 +265,14 @@ const handleRegister = async () => {
 }
 
 .logo-image {
-  width: 60px;
-  height: 60px;
+  width: 200px;
+  height: auto;
   margin-bottom: 1rem;
-}
-
-.auth-logo h1 {
-  font-family: 'Montserrat Alternates', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #2b499b;
-  margin: 0;
-  letter-spacing: 1px;
 }
 
 .auth-header h2 {
   font-family: 'Montserrat Alternates', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 600;
   color: #333;
   margin: 0;
@@ -364,41 +396,73 @@ const handleRegister = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 0;
+  min-height: 100vh;
+  position: relative;
 }
 
 .illustration-image {
   width: 100%;
-  max-width: 500px;
-  height: auto;
-  border-radius: 15px;
-  border: 3px solid #87ceeb;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
   .auth-content {
     grid-template-columns: 1fr;
-    gap: 2rem;
-    max-width: 500px;
+    gap: 0;
+    max-width: 100%;
   }
 
   .auth-illustration {
     order: -1;
+    padding: 0;
+    min-height: 50vh;
+  }
+
+  .auth-form-section {
+    padding: 3rem 2rem;
+    min-height: 50vh;
   }
 
   .illustration-image {
-    max-width: 400px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 
-@media (max-width: 768px) {
-  .auth-container {
-    padding: 1rem;
+@media (max-width: 1024px) {
+  .register-page {
+    padding: 0;
+  }
+
+  .back-button {
+    top: 1rem;
+    left: 1rem;
+  }
+
+  .auth-content {
+    border-radius: 0;
+    margin-top: 0;
+  }
+
+  .auth-form-section {
+    padding: 2rem 1.5rem;
+    min-height: 100vh;
   }
 
   .auth-form-card {
-    padding: 2rem;
+    max-width: 90%;
+  }
+
+  .auth-illustration {
+    display: none;
   }
 
   .auth-logo h1 {
@@ -406,13 +470,13 @@ const handleRegister = async () => {
   }
 
   .auth-header h2 {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
   }
 }
 
 @media (max-width: 480px) {
-  .auth-form-card {
-    padding: 1.5rem;
+  .auth-form-section {
+    padding: 1.5rem 1rem;
   }
 
   .auth-logo h1 {
@@ -421,10 +485,6 @@ const handleRegister = async () => {
 
   .auth-header h2 {
     font-size: 1.2rem;
-  }
-
-  .illustration-image {
-    max-width: 300px;
   }
 }
 </style>
