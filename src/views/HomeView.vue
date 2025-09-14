@@ -23,7 +23,7 @@
       <div v-if="loading" class="loading">Chargement des séries...</div>
       <div v-else-if="error" class="error">Erreur : {{ error }}</div>
       <div v-else class="cards-grid">
-        <div v-for="set in series" :key="set.id" class="card-item">
+        <div v-for="set in series" :key="set.id" class="card-item" @click="goToSet(set)">
           <img :src="getCardImage(set.name)" :alt="set.name" class="card-image" />
           <h4 class="card-title">{{ set.name }}</h4>
         </div>
@@ -47,6 +47,7 @@ import { useRouter } from 'vue-router'
 import { useSetsStore } from '@/stores/sets'
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
+import type { Set as SetType } from '@/types'
 
 const router = useRouter()
 const setsStore = useSetsStore()
@@ -55,8 +56,6 @@ const setsStore = useSetsStore()
 const series = computed(() => setsStore.latestSets)
 const loading = computed(() => setsStore.isLoading)
 const error = computed(() => setsStore.error)
-
-// Plus besoin de fetchSeries - le store s'en occupe !
 
 const getCardImage = (setName: string): string => {
   // Mapping des noms de sets vers les images disponibles
@@ -71,6 +70,10 @@ const getCardImage = (setName: string): string => {
   }
 
   return imageMap[setName] || '/logocard.png' // Image par défaut
+}
+
+const goToSet = (set: SetType) => {
+  router.push(`/sets/${set.id}`)
 }
 
 const goToSets = () => {
@@ -202,6 +205,7 @@ onMounted(() => {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(43, 73, 155, 0.15);
+  cursor: pointer;
 }
 
 .card-item:hover {
