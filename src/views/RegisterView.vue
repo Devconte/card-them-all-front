@@ -437,7 +437,7 @@ const handleRegister = async () => {
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .register-page {
     padding: 0;
   }
@@ -455,10 +455,6 @@ const handleRegister = async () => {
   .auth-form-section {
     padding: 2rem 1.5rem;
     min-height: 100vh;
-  }
-
-  .auth-form-card {
-    max-width: 90%;
   }
 
   .auth-illustration {
