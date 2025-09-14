@@ -42,65 +42,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import { useSetsStore } from '@/stores/sets'
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
-import type { Set } from '@/types'
 
 const router = useRouter()
+const setsStore = useSetsStore()
 
-const series = ref<Set[]>([])
-const loading = ref<boolean>(false)
-const error = ref<string | null>(null)
+// Utiliser les données du store
+const series = computed(() => setsStore.latestSets)
+const loading = computed(() => setsStore.isLoading)
+const error = computed(() => setsStore.error)
 
-const fetchSeries = async (): Promise<void> => {
-  loading.value = true
-  error.value = null
-
-  try {
-    // Récupérer la liste des sets
-    const response = await axios.get<Set[]>('/api/cards/sets/list')
-    const allSets = response.data
-
-    // Prendre les 10 derniers sets (pour avoir plus de choix)
-    // Filtrer les sets Pokémon Pocket (tcgp, A1, A2, A3, A4, etc.)
-    const filteredSets = allSets.filter(
-      (set: Set) => !set.id.includes('tcgp') && !set.id.startsWith('A') && !set.id.includes('P-A'),
-    )
-    const lastSets = filteredSets.slice(-5)
-
-    // Récupérer les détails de chaque set pour avoir les dates
-    const setsWithDates = await Promise.all(
-      lastSets.map(async (set: Set) => {
-        try {
-          const detailResponse = await axios.get<Set>(`/api/cards/sets/${set.id}`)
-          return {
-            ...set,
-            releaseDate: detailResponse.data.releaseDate,
-          }
-        } catch {
-          // Si erreur, garder le set sans date
-          return { ...set, releaseDate: null }
-        }
-      }),
-    )
-
-    // Trier par date de sortie (les plus récents en premier)
-    const sortedSets = setsWithDates
-      .filter((set) => set.releaseDate) // Garder seulement ceux avec une date
-      .sort((a, b) => new Date(b.releaseDate!).getTime() - new Date(a.releaseDate!).getTime())
-      .slice(0, 5) // Prendre les 5 plus récents
-
-    series.value = sortedSets as Set[]
-  } catch (err) {
-    error.value = 'Erreur lors du chargement des séries'
-    console.error('Erreur:', err)
-  } finally {
-    loading.value = false
-  }
-}
+// Plus besoin de fetchSeries - le store s'en occupe !
 
 const getCardImage = (setName: string): string => {
   // Mapping des noms de sets vers les images disponibles
@@ -122,7 +78,7 @@ const goToSets = () => {
 }
 
 onMounted(() => {
-  fetchSeries()
+  setsStore.fetchSets()
 })
 </script>
 

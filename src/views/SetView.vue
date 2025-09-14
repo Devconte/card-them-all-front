@@ -29,7 +29,7 @@
       <!-- Error State -->
       <div v-else-if="error" class="error">
         <p>Erreur : {{ error }}</p>
-        <button @click="fetchSets" class="retry-btn">Réessayer</button>
+        <button @click="() => setsStore.fetchSets(true)" class="retry-btn">Réessayer</button>
       </div>
 
       <!-- Sets Content -->
@@ -61,77 +61,27 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import { useSetsStore } from '@/stores/sets'
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
-import type { Set } from '@/types'
 
 const router = useRouter()
+const setsStore = useSetsStore()
 
 // Reactive data
-const sets = ref<Set[]>([])
-const loading = ref<boolean>(false)
-const error = ref<string | null>(null)
 const searchQuery = ref<string>('')
+
+// Utiliser les données du store
+const sets = computed(() => setsStore.sets)
+const loading = computed(() => setsStore.isLoading)
+const error = computed(() => setsStore.error)
 
 // Computed properties
 const filteredSets = computed(() => {
-  let filtered = sets.value
-
-  // Filter by search query
-  if (searchQuery.value) {
-    filtered = filtered.filter((set) =>
-      set.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
-    )
-  }
-
-  return filtered
+  return setsStore.filteredSets(searchQuery.value)
 })
 
-// Methods
-const fetchSets = async (): Promise<void> => {
-  loading.value = true
-  error.value = null
-
-  try {
-    // Récupérer la liste des sets
-    const response = await axios.get<Set[]>('/api/cards/sets/list')
-    const allSets = response.data
-
-    // Filtrer les sets Pokémon Pocket
-    const filteredSets = allSets.filter(
-      (set: Set) => !set.id.includes('tcgp') && !set.id.startsWith('A') && !set.id.includes('P-A'),
-    )
-
-    // Récupérer les détails de chaque set pour avoir les dates
-    const setsWithDates = await Promise.all(
-      filteredSets.map(async (set: Set) => {
-        try {
-          const detailResponse = await axios.get<Set>(`/api/cards/sets/${set.id}`)
-          return {
-            ...set,
-            releaseDate: detailResponse.data.releaseDate,
-          }
-        } catch {
-          // Si erreur, garder le set sans date
-          return { ...set, releaseDate: null }
-        }
-      }),
-    )
-
-    // Trier par date de sortie (les plus récents en premier)
-    const sortedSets = setsWithDates
-      .filter((set) => set.releaseDate) // Garder seulement ceux avec une date
-      .sort((a, b) => new Date(b.releaseDate!).getTime() - new Date(a.releaseDate!).getTime())
-
-    sets.value = sortedSets
-  } catch (err) {
-    console.error('Erreur lors du chargement des sets:', err)
-    error.value = 'Erreur lors du chargement des sets'
-  } finally {
-    loading.value = false
-  }
-}
+// Plus besoin de fetchSets - le store s'en occupe !
 
 const getSerieImage = (serieName: string): string => {
   const imageMap: Record<string, string> = {
@@ -162,7 +112,7 @@ const goToSet = (set: Set) => {
 
 // Lifecycle
 onMounted(() => {
-  fetchSets()
+  setsStore.fetchSets()
 })
 </script>
 
