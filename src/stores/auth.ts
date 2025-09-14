@@ -228,10 +228,12 @@ export const useAuthStore = defineStore('auth', () => {
     async (error: AxiosErrorType) => {
       const originalRequest = error.config
 
-      // Skip interceptor for public routes
+      // Enlever l'intercepteur pour les routes publiques
       if (
         originalRequest?.url?.includes('/cards/sets/list') ||
-        originalRequest?.url?.includes('/cards/sets/')
+        originalRequest?.url?.includes('/cards/sets/') ||
+        originalRequest?.url?.includes('/api/cards/sets/') ||
+        originalRequest?.url?.includes('/booster-pack/sets/')
       ) {
         return Promise.reject(error)
       }
