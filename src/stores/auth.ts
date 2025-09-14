@@ -228,6 +228,14 @@ export const useAuthStore = defineStore('auth', () => {
     async (error: AxiosErrorType) => {
       const originalRequest = error.config
 
+      // Skip interceptor for public routes
+      if (
+        originalRequest?.url?.includes('/cards/sets/list') ||
+        originalRequest?.url?.includes('/cards/sets/')
+      ) {
+        return Promise.reject(error)
+      }
+
       if (error.response?.status === 401 && !originalRequest?._retry) {
         if (isRefreshing) {
           // Si on est déjà en train de refresh, on met en queue
