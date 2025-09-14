@@ -34,16 +34,38 @@
 
       <!-- Sets Content -->
       <div v-else class="sets-content">
-        <!-- Sets Grid -->
-        <div class="sets-grid">
-          <div v-for="set in filteredSets" :key="set.id" class="set-card" @click="goToSet(set)">
-            <img :src="getSerieImage(set.name)" :alt="set.name" class="set-image" />
-            <div class="set-info">
-              <h3 class="set-name">{{ set.name }}</h3>
-              <p v-if="set.serie" class="set-serie">Série: {{ set.serie.name }}</p>
-              <p class="set-date">{{ formatDate(set.releaseDate || null) }}</p>
-              <p v-if="set.cardCount" class="set-cards">{{ set.cardCount.total }} cartes</p>
+        <!-- Grouped by Series -->
+        <div v-for="serie in groupedSets" :key="serie.name" class="serie-section">
+          <h2 class="serie-title">{{ serie.name }}</h2>
+          <div class="sets-grid">
+            <div
+              v-for="set in serie.displayedSets"
+              :key="set.id"
+              class="set-card"
+              @click="goToSet(set)"
+            >
+              <img :src="getSerieImage(set.name)" :alt="set.name" class="set-image" />
+              <div class="set-name">
+                <div class="set-title">{{ set.name }}</div>
+                <div class="set-details">
+                  <span class="set-date">{{ formatDate(set.releaseDate || null) }}</span>
+                  <span v-if="set.cardCount" class="set-cards"
+                    >{{ set.cardCount.total }} cartes</span
+                  >
+                </div>
+              </div>
             </div>
+          </div>
+
+          <!-- Bouton "Voir plus" si nécessaire -->
+          <div v-if="serie.hasMore" class="view-more-section">
+            <button @click="toggleSeries(serie.name)" class="view-more-btn">
+              {{
+                expandedSeries.has(serie.name)
+                  ? 'Voir moins'
+                  : `Voir plus (${serie.totalSets - 4} autres)`
+              }}
+            </button>
           </div>
         </div>
 
@@ -64,12 +86,14 @@ import { useRouter } from 'vue-router'
 import { useSetsStore } from '@/stores/sets'
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
+import type { Set as SetType } from '@/types'
 
 const router = useRouter()
 const setsStore = useSetsStore()
 
 // Reactive data
 const searchQuery = ref<string>('')
+const expandedSeries = ref<Set<string>>(new Set())
 
 // Utiliser les données du store
 const sets = computed(() => setsStore.sets)
@@ -81,7 +105,30 @@ const filteredSets = computed(() => {
   return setsStore.filteredSets(searchQuery.value)
 })
 
-// Plus besoin de fetchSets - le store s'en occupe !
+// Group sets by series
+const groupedSets = computed(() => {
+  const groups: Record<string, SetType[]> = {}
+
+  filteredSets.value.forEach((set) => {
+    const serieName = set.serie?.name || 'Autres'
+    if (!groups[serieName]) {
+      groups[serieName] = []
+    }
+    groups[serieName].push(set)
+  })
+
+  // Convert to array and sort by most recent release date in each serie
+  return Object.entries(groups)
+    .map(([name, sets]) => ({
+      name,
+      sets,
+      totalSets: sets.length,
+      displayedSets: expandedSeries.value.has(name) ? sets : sets.slice(0, 4),
+      hasMore: sets.length > 4,
+      latestDate: Math.max(...sets.map((set) => new Date(set.releaseDate || 0).getTime())),
+    }))
+    .sort((a, b) => b.latestDate - a.latestDate) // Most recent first
+})
 
 const getSerieImage = (serieName: string): string => {
   const imageMap: Record<string, string> = {
@@ -106,8 +153,16 @@ const formatDate = (dateString: string | null): string => {
   })
 }
 
-const goToSet = (set: Set) => {
+const goToSet = (set: SetType) => {
   router.push(`/sets/${set.id}`)
+}
+
+const toggleSeries = (serieName: string) => {
+  if (expandedSeries.value.has(serieName)) {
+    expandedSeries.value.delete(serieName)
+  } else {
+    expandedSeries.value.add(serieName)
+  }
 }
 
 // Lifecycle
@@ -125,36 +180,39 @@ onMounted(() => {
 /* Header Section */
 .series-header {
   background: linear-gradient(135deg, #2b499b 0%, #1e3d6f 100%);
-  padding: 3rem 2rem;
-  text-align: center;
+  padding: 2rem;
 }
 
 .header-content {
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
 }
 
 .page-title {
   color: white;
-  font-size: 3rem;
-  font-weight: 700;
-  margin: 0 0 2rem 0;
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 35px;
+  margin: 0;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 
 .search-container {
   position: relative;
-  max-width: 500px;
-  margin: 0 auto;
+  max-width: 300px;
+  flex-shrink: 0;
 }
 
 .search-input {
   width: 100%;
-  padding: 1rem 3rem 1rem 1.5rem;
+  padding: 0.8rem 2.5rem 0.8rem 1.2rem;
   border: none;
   border-radius: 50px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   background: white;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
@@ -168,57 +226,36 @@ onMounted(() => {
 
 .search-icon {
   position: absolute;
-  right: 1.5rem;
+  right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: #666;
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Main Content */
 .main-content {
-  padding: 3rem 2rem;
+  padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  background: #f8f9fa;
 }
 
-/* Filter Tabs */
-.filter-tabs {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 3rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.filter-tab {
-  padding: 0.8rem 1.5rem;
-  border: 2px solid #2b499b;
+/* Serie Section */
+.serie-section {
   background: white;
-  color: #2b499b;
-  border-radius: 25px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
 }
 
-.filter-tab:hover {
-  background: #f0f0f0;
-}
-
-.filter-tab.active {
-  background: #2b499b;
-  color: white;
-}
-
-/* Block Section */
-.block-section {
-  margin-bottom: 4rem;
-}
-
-.block-title {
-  font-size: 2rem;
-  font-weight: 700;
+.serie-title {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 35px;
   color: #2b499b;
   margin: 0 0 2rem 0;
   text-transform: uppercase;
@@ -231,17 +268,20 @@ onMounted(() => {
 /* Sets Grid */
 .sets-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
 }
 
 .set-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(43, 73, 155, 0.15);
   transition: all 0.3s ease;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 325px; /* Hauteur fixe pour toutes les cartes */
 }
 
 .set-card:hover {
@@ -251,40 +291,68 @@ onMounted(() => {
 
 .set-image {
   width: 100%;
-  height: 200px;
+  height: 240px;
   object-fit: cover;
-}
-
-.set-info {
-  padding: 1.5rem;
+  object-position: center;
+  flex-shrink: 0;
 }
 
 .set-name {
-  font-size: 1.2rem;
-  font-weight: 700;
+  background: #2b499b;
+  color: white;
+  padding: 0.8rem 1rem;
+  text-align: center;
+  height: 85px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.set-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+}
+
+.set-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  opacity: 0.9;
+  margin-top: 0.3rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* View More Section */
+.view-more-section {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.view-more-btn {
+  background: #facf19;
   color: #2b499b;
-  margin: 0 0 0.5rem 0;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 25px;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.set-serie {
-  color: #2b499b;
-  font-size: 0.85rem;
-  font-weight: 500;
-  margin: 0.25rem 0;
-}
-
-.set-date {
-  color: #666;
-  margin: 0.25rem 0;
-  font-size: 0.9rem;
-}
-
-.set-cards {
-  color: #888;
-  font-size: 0.8rem;
-  margin: 0.25rem 0 0 0;
+.view-more-btn:hover {
+  background: #e6ba00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(250, 207, 25, 0.3);
 }
 
 /* Loading State */
@@ -345,23 +413,39 @@ onMounted(() => {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .series-header {
+    padding: 1.5rem 1rem;
+  }
+
+  .header-content {
+    gap: 1rem;
+    text-align: left;
+  }
+
   .page-title {
-    font-size: 2rem;
+    font-size: 28px;
   }
 
-  .filter-tabs {
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding-bottom: 1rem;
+  .search-container {
+    max-width: 100%;
   }
 
-  .series-grid {
+  .main-content {
+    padding: 1rem;
+  }
+
+  .serie-section {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sets-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
   }
 
-  .block-title {
-    font-size: 1.5rem;
+  .serie-title {
+    font-size: 28px;
   }
 }
 </style>
