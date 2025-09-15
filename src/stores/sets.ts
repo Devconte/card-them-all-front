@@ -51,25 +51,12 @@ export const useSetsStore = defineStore('sets', () => {
     error.value = null
 
     try {
-      const response = await axios.get<Set[]>('/api/cards/sets/list')
-      const setsData = response.data
+      // Utiliser le fichier JSON statique - plus de requêtes API !
+      const response = await fetch('/sets.json')
+      const setsData: Set[] = await response.json()
 
-      // Fetch detailed info for each set (including releaseDate and serie)
-      const setsWithDetails = await Promise.all(
-        setsData.map(async (set) => {
-          try {
-            const detailResponse = await axios.get<Set>(`/api/cards/sets/${set.id}`)
-            return {
-              ...set,
-              releaseDate: detailResponse.data.releaseDate,
-              serie: detailResponse.data.serie,
-            }
-          } catch {
-            // Si erreur, garder le set sans date
-            return { ...set, releaseDate: null, serie: undefined }
-          }
-        }),
-      )
+      // Les données sont déjà complètes avec releaseDate et serie
+      const setsWithDetails = setsData
 
       // Filter out Pokémon Pocket sets (more robust filtering)
       const filteredSets = setsWithDetails.filter(
@@ -100,8 +87,16 @@ export const useSetsStore = defineStore('sets', () => {
 
   const fetchSetById = async (setId: string) => {
     try {
-      const response = await axios.get<Set>(`/api/cards/sets/${setId}`)
-      return response.data
+      // Utiliser le fichier JSON statique
+      const response = await fetch('/sets.json')
+      const sets: Set[] = await response.json()
+      const set = sets.find((s) => s.id === setId)
+
+      if (!set) {
+        throw new Error(`Set ${setId} not found`)
+      }
+
+      return set
     } catch (err) {
       error.value = `Erreur lors du chargement du set ${setId}`
       console.error('Erreur:', err)
