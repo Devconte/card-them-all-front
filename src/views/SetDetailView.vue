@@ -90,7 +90,16 @@
               class="card-item"
               @click="selectCard(card)"
             >
-              <img :src="getCardImage(card)" :alt="card.name" class="card-image" />
+              <picture>
+                <source :srcset="getOptimizedCardImage(card)" type="image/webp" />
+                <img
+                  :src="getCardImage(card)"
+                  :alt="card.name"
+                  class="card-image"
+                  loading="lazy"
+                  @error="handleImageError"
+                />
+              </picture>
               <div class="card-info">
                 <h4 class="card-name">{{ card.name }}</h4>
                 <p class="card-rarity">{{ card.rarity }}</p>
@@ -216,6 +225,25 @@ const isCardOwned = (_cardId: string): boolean => {
 
 const getCardImage = (card: Card): string => {
   return card.image || '/logocard.png'
+}
+
+// Optimize image URL for WebP if supported
+const getOptimizedCardImage = (card: Card): string => {
+  const originalImage = card.image || '/logocard.png'
+
+  // Si c'est une image TCGdx, on peut essayer de l'optimiser
+  if (originalImage.includes('tcgdx.net') || originalImage.includes('tcgdex.net')) {
+    // Remplacer l'extension par .webp si possible
+    return originalImage.replace(/\.(jpg|jpeg|png)$/i, '.webp')
+  }
+
+  return originalImage
+}
+
+// Image error handling
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  img.src = '/logocard.png' // Fallback image
 }
 
 // Lifecycle
