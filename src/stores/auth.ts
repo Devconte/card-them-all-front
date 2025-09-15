@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios, { type AxiosResponse, type AxiosError as AxiosErrorType } from 'axios'
 
+// Configuration d'axios
+axios.defaults.baseURL = 'http://localhost:3000'
+
 // Extension du type pour ajouter _retry
 declare module 'axios' {
   interface InternalAxiosRequestConfig {
@@ -52,7 +55,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     try {
-      const response = await axios.post('/api/auth/refresh', {
+      const response = await axios.post('/auth/refresh', {
         refresh_token: refreshToken.value,
       })
 
@@ -74,7 +77,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     try {
-      const response = await axios.post('/api/auth/login', {
+      const response = await axios.post('/auth/login', {
         email,
         password,
       })
@@ -94,6 +97,20 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Configurer axios pour les requêtes suivantes
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+
+      // Debug
+      console.log('✅ Login successful!')
+      console.log('🔑 Access token:', access_token)
+      console.log('🔄 Refresh token:', refresh_token)
+      console.log('👤 User:', userData)
+
+      // Vérifier le stockage
+      console.log('📦 Token in sessionStorage:', sessionStorage.getItem('access_token'))
+      console.log('📦 Refresh token in sessionStorage:', sessionStorage.getItem('refresh_token'))
+      console.log('📦 User in sessionStorage:', sessionStorage.getItem('user'))
+
+      // Vérifier axios headers
+      console.log('🌐 Axios Authorization header:', axios.defaults.headers.common['Authorization'])
 
       return true
     } catch (err: unknown) {
@@ -119,13 +136,16 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     try {
-      const response = await axios.post('/api/auth/register', {
+      console.log('Attempting registration with:', { email, username })
+
+      const response = await axios.post('/auth/register', {
         email,
         password,
         confirmPassword,
         username,
       })
 
+      console.log('Registration response:', response.data)
       const { user: userData, access_token, refresh_token } = response.data
 
       // Mettre à jour l'état
@@ -141,6 +161,12 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Configurer axios
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+
+      // Debug
+      console.log('✅ Registration successful!')
+      console.log('🔑 Access token:', access_token)
+      console.log('🔄 Refresh token:', refresh_token)
+      console.log('👤 User:', userData)
 
       return true
     } catch (err: unknown) {

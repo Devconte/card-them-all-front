@@ -63,11 +63,6 @@
         <div class="cards-content">
           <div class="cards-header">
             <h2 class="cards-title">Collection</h2>
-            <div class="collection-stats">
-              <span class="owned-count"
-                >{{ ownedCardsCount }} / {{ totalCardsCount }} possédées</span
-              >
-            </div>
           </div>
 
           <!-- Loading State -->
