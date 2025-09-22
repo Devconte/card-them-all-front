@@ -7,7 +7,7 @@
       <div class="header-content">
         <div class="title-container">
           <img src="/pokeball.png" alt="Pokéball" class="pokeball-icon" />
-          <h1 class="page-title">SETS</h1>
+          <h1 class="page-title">Séries</h1>
         </div>
       </div>
       <div class="search-section">
@@ -82,6 +82,7 @@
                 @click="scrollSliderLeft(serie.name)"
                 class="arrow-btn arrow-left"
               >
+                <!-- eslint-disable-next-line vue/no-parsing-error -->
                 <
               </button>
               <button @click="scrollSliderRight(serie.name)" class="arrow-btn arrow-right">

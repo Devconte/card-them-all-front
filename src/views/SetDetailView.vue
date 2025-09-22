@@ -32,7 +32,7 @@
             <div class="filter-section">
               <h3 class="filter-title">Rareté</h3>
               <div class="filter-options">
-                <label v-for="rarity in rarities" :key="rarity" class="checkbox-option">
+                <label v-for="rarity in availableRarities" :key="rarity" class="checkbox-option">
                   <input
                     type="checkbox"
                     :value="rarity"
@@ -97,7 +97,7 @@
               </picture>
               <div class="card-info">
                 <h4 class="card-name">{{ card.name }}</h4>
-                <p class="card-rarity">{{ card.rarity }}</p>
+                <p class="card-rarity">{{ card.rarity?.name || 'N/A' }}</p>
               </div>
             </div>
           </div>
@@ -121,18 +121,7 @@ import { useSetCardsStore } from '@/stores/setCards';
 import { useAuthStore } from '@/stores/auth';
 import AppNavbar from '@/components/AppNavbar.vue';
 import AppFooter from '@/components/AppFooter.vue';
-import type { Set as SetType } from '@/types';
-
-interface Card {
-  id: string;
-  name: string;
-  localId: string;
-  image: string;
-  rarity: string;
-  serie?: {
-    name: string;
-  };
-}
+import type { Set as SetType, Card } from '@/types';
 
 const route = useRoute();
 const router = useRouter();
@@ -147,34 +136,48 @@ const selectedRarities = ref<string[]>([]);
 
 // Computed from store
 const cards = computed(() => setCardsStore.getSetCards(route.params.id as string));
-const rarities = computed(() => setCardsStore.getSetRarities(route.params.id as string));
 const isLoading = computed(() => setCardsStore.isLoading(route.params.id as string));
 const error = computed(() => setCardsStore.getError(route.params.id as string));
 
-const filteredCards = computed(() => {
+// Cartes filtrées par recherche uniquement (pour les rarités disponibles)
+const searchFilteredCards = computed(() => {
   let filtered = cards.value;
 
   // Search filter
-  if (searchQuery.value) {
+  if (searchQuery.value.trim()) {
     filtered = filtered.filter((card) =>
       card.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
     );
   }
 
-  // Rarity filter (multiple selection)
-  if (selectedRarities.value.length > 0) {
-    filtered = filtered.filter((card) => selectedRarities.value.includes(card.rarity));
-  }
-
   return filtered;
 });
 
-const ownedCardsCount = computed(() => {
-  return cards.value.filter((card) => isCardOwned(card.id)).length;
+// Rarités disponibles basées sur les cartes filtrées par recherche
+const availableRarities = computed(() => {
+  const uniqueRarities = [
+    ...new Set(
+      searchFilteredCards.value
+        .map((card) => card.rarity?.name)
+        .filter((name): name is string => Boolean(name)),
+    ),
+  ];
+
+  return uniqueRarities.sort();
 });
 
-const totalCardsCount = computed(() => {
-  return cards.value.length;
+// Cartes finales avec tous les filtres
+const filteredCards = computed(() => {
+  let filtered = searchFilteredCards.value;
+
+  // Rarity filter (multiple selection)
+  if (selectedRarities.value.length > 0) {
+    filtered = filtered.filter(
+      (card) => card.rarity?.name && selectedRarities.value.includes(card.rarity.name),
+    );
+  }
+
+  return filtered;
 });
 
 // Methods
@@ -185,9 +188,9 @@ const fetchSetDetails = async () => {
   loading.value = true;
   try {
     // Fetch set details
-    const response = await fetch(`http://localhost:3000/cards/sets/${setId}`);
+    const response = await fetch(`http://localhost:3000/sets/${setId}`);
     const setData = await response.json();
-    set.value = setData;
+    set.value = setData.data;
 
     // Fetch cards using store (with cache)
     await setCardsStore.fetchSetCards(setId);
@@ -219,20 +222,23 @@ const isCardOwned = (_cardId: string): boolean => {
 };
 
 const getCardImage = (card: Card): string => {
-  return card.image || '/logocard.png';
+  const baseImage = card.image || '/logocard.png';
+  if (baseImage.includes('tcgdx.net') || baseImage.includes('tcgdex.net')) {
+    return `${baseImage}/high.webp`;
+  }
+  return baseImage;
 };
 
 // Optimize image URL for WebP if supported
 const getOptimizedCardImage = (card: Card): string => {
-  const originalImage = card.image || '/logocard.png';
+  const baseImage = card.image || '/logocard.png';
 
-  // Si c'est une image TCGdx, on peut essayer de l'optimiser
-  if (originalImage.includes('tcgdx.net') || originalImage.includes('tcgdex.net')) {
-    // Remplacer l'extension par .webp si possible
-    return originalImage.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+  // Si c'est une image TCGdex, ajouter /high.webp
+  if (baseImage.includes('tcgdex.net')) {
+    return `${baseImage}/high.webp`;
   }
 
-  return originalImage;
+  return baseImage;
 };
 
 // Image error handling

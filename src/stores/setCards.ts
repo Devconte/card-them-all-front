@@ -1,16 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-
-interface Card {
-  id: string;
-  name: string;
-  localId: string;
-  image: string;
-  rarity: string;
-  serie?: {
-    name: string;
-  };
-}
+import type { Card } from '@/types';
 
 interface SetCardsState {
   [setId: string]: {
@@ -36,7 +26,6 @@ export const useSetCardsStore = defineStore('setCards', () => {
 
     // Vérifier le cache
     if (!force && cached && now - cached.lastFetch < CACHE_DURATION) {
-      console.log(`Cache hit for set ${setId}`);
       return cached.cards;
     }
 
@@ -55,24 +44,31 @@ export const useSetCardsStore = defineStore('setCards', () => {
     state.value[setId].error = null;
 
     try {
-      console.log(`Fetching cards for set ${setId}`);
-      const response = await fetch(`http://localhost:3000/booster-pack/sets/${setId}/cards`);
+      const response = await fetch(`http://localhost:3000/cards/sets/${setId}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as { data: Card[] };
+
+      // Extraire les rarités uniques
+      const uniqueRarities = [
+        ...new Set(
+          data.data
+            ?.map((card: Card) => card.rarity?.name)
+            .filter((name): name is string => Boolean(name)) || [],
+        ),
+      ];
 
       state.value[setId] = {
-        cards: data.allCardsFromSet || [],
-        rarities: data.availableRarities || [],
+        cards: data.data || [],
+        rarities: uniqueRarities,
         loading: false,
         error: null,
         lastFetch: now,
       };
 
-      console.log(`Cached ${state.value[setId].cards.length} cards for set ${setId}`);
       return state.value[setId].cards;
     } catch (error) {
       console.error(`Error fetching cards for set ${setId}:`, error);
