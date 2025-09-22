@@ -81,41 +81,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useSetsStore } from '@/stores/sets'
-import Navbar from '@/components/Navbar.vue'
-import Footer from '@/components/Footer.vue'
-import type { Set as SetType } from '@/types'
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useSetsStore } from '@/stores/sets';
+import Navbar from '@/components/Navbar.vue';
+import Footer from '@/components/Footer.vue';
+import type { Set as SetType } from '@/types';
 
-const router = useRouter()
-const setsStore = useSetsStore()
+const router = useRouter();
+const setsStore = useSetsStore();
 
 // Reactive data
-const searchQuery = ref<string>('')
-const expandedSeries = ref<Set<string>>(new Set())
+const searchQuery = ref<string>('');
+const expandedSeries = ref<Set<string>>(new Set());
 
 // Utiliser les données du store
-const sets = computed(() => setsStore.sets)
-const loading = computed(() => setsStore.isLoading)
-const error = computed(() => setsStore.error)
+const sets = computed(() => setsStore.sets);
+const loading = computed(() => setsStore.isLoading);
+const error = computed(() => setsStore.error);
 
 // Computed properties
 const filteredSets = computed(() => {
-  return setsStore.filteredSets(searchQuery.value)
-})
+  return setsStore.filteredSets(searchQuery.value);
+});
 
 // Group sets by series
 const groupedSets = computed(() => {
-  const groups: Record<string, SetType[]> = {}
+  const groups: Record<string, SetType[]> = {};
 
   filteredSets.value.forEach((set) => {
-    const serieName = set.serie?.name || 'Autres'
+    const serieName = set.serie?.name || 'Autres';
     if (!groups[serieName]) {
-      groups[serieName] = []
+      groups[serieName] = [];
     }
-    groups[serieName].push(set)
-  })
+    groups[serieName].push(set);
+  });
 
   // Convert to array and sort by most recent release date in each serie
   return Object.entries(groups)
@@ -127,8 +127,8 @@ const groupedSets = computed(() => {
       hasMore: sets.length > 4,
       latestDate: Math.max(...sets.map((set) => new Date(set.releaseDate || 0).getTime())),
     }))
-    .sort((a, b) => b.latestDate - a.latestDate) // Most recent first
-})
+    .sort((a, b) => b.latestDate - a.latestDate); // Most recent first
+});
 
 const getSerieImage = (serieName: string): string => {
   const imageMap: Record<string, string> = {
@@ -139,36 +139,36 @@ const getSerieImage = (serieName: string): string => {
     'Évolutions Prismatiques': '/évolution prismatique.png',
     'Couronne Stellaire': '/couronnestelaire.png',
     'Étincelles Déferlantes': '/foudreblanche.png',
-  }
+  };
 
-  return imageMap[serieName] || '/logocard.png'
-}
+  return imageMap[serieName] || '/logocard.png';
+};
 
 const formatDate = (dateString: string | null): string => {
-  if (!dateString) return 'Date inconnue'
-  const date = new Date(dateString)
+  if (!dateString) return 'Date inconnue';
+  const date = new Date(dateString);
   return date.toLocaleDateString('fr-FR', {
     year: 'numeric',
     month: 'long',
-  })
-}
+  });
+};
 
 const goToSet = (set: SetType) => {
-  router.push(`/sets/${set.id}`)
-}
+  router.push(`/sets/${set.id}`);
+};
 
 const toggleSeries = (serieName: string) => {
   if (expandedSeries.value.has(serieName)) {
-    expandedSeries.value.delete(serieName)
+    expandedSeries.value.delete(serieName);
   } else {
-    expandedSeries.value.add(serieName)
+    expandedSeries.value.add(serieName);
   }
-}
+};
 
 // Lifecycle
 onMounted(() => {
-  setsStore.fetchSets()
-})
+  setsStore.fetchSets();
+});
 </script>
 
 <style scoped>

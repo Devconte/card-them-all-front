@@ -115,136 +115,136 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useSetCardsStore } from '@/stores/setCards'
-import { useAuthStore } from '@/stores/auth'
-import Navbar from '@/components/Navbar.vue'
-import Footer from '@/components/Footer.vue'
-import type { Set as SetType } from '@/types'
+import { ref, computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useSetCardsStore } from '@/stores/setCards';
+import { useAuthStore } from '@/stores/auth';
+import Navbar from '@/components/Navbar.vue';
+import Footer from '@/components/Footer.vue';
+import type { Set as SetType } from '@/types';
 
 interface Card {
-  id: string
-  name: string
-  localId: string
-  image: string
-  rarity: string
+  id: string;
+  name: string;
+  localId: string;
+  image: string;
+  rarity: string;
   serie?: {
-    name: string
-  }
+    name: string;
+  };
 }
 
-const route = useRoute()
-const router = useRouter()
-const setCardsStore = useSetCardsStore()
-const authStore = useAuthStore()
+const route = useRoute();
+const router = useRouter();
+const setCardsStore = useSetCardsStore();
+const authStore = useAuthStore();
 
 // Reactive data
-const loading = ref<boolean>(false)
-const set = ref<SetType | null>(null)
-const searchQuery = ref<string>('')
-const selectedRarities = ref<string[]>([])
+const loading = ref<boolean>(false);
+const set = ref<SetType | null>(null);
+const searchQuery = ref<string>('');
+const selectedRarities = ref<string[]>([]);
 
 // Computed from store
-const cards = computed(() => setCardsStore.getSetCards(route.params.id as string))
-const rarities = computed(() => setCardsStore.getSetRarities(route.params.id as string))
-const isLoading = computed(() => setCardsStore.isLoading(route.params.id as string))
-const error = computed(() => setCardsStore.getError(route.params.id as string))
+const cards = computed(() => setCardsStore.getSetCards(route.params.id as string));
+const rarities = computed(() => setCardsStore.getSetRarities(route.params.id as string));
+const isLoading = computed(() => setCardsStore.isLoading(route.params.id as string));
+const error = computed(() => setCardsStore.getError(route.params.id as string));
 
 const filteredCards = computed(() => {
-  let filtered = cards.value
+  let filtered = cards.value;
 
   // Search filter
   if (searchQuery.value) {
     filtered = filtered.filter((card) =>
       card.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
-    )
+    );
   }
 
   // Rarity filter (multiple selection)
   if (selectedRarities.value.length > 0) {
-    filtered = filtered.filter((card) => selectedRarities.value.includes(card.rarity))
+    filtered = filtered.filter((card) => selectedRarities.value.includes(card.rarity));
   }
 
-  return filtered
-})
+  return filtered;
+});
 
 const ownedCardsCount = computed(() => {
-  return cards.value.filter((card) => isCardOwned(card.id)).length
-})
+  return cards.value.filter((card) => isCardOwned(card.id)).length;
+});
 
 const totalCardsCount = computed(() => {
-  return cards.value.length
-})
+  return cards.value.length;
+});
 
 // Methods
 const fetchSetDetails = async () => {
-  const setId = route.params.id as string
-  if (!setId) return
+  const setId = route.params.id as string;
+  if (!setId) return;
 
-  loading.value = true
+  loading.value = true;
   try {
     // Fetch set details
-    const response = await fetch(`http://localhost:3000/cards/sets/${setId}`)
-    const setData = await response.json()
-    set.value = setData
+    const response = await fetch(`http://localhost:3000/cards/sets/${setId}`);
+    const setData = await response.json();
+    set.value = setData;
 
     // Fetch cards using store (with cache)
-    await setCardsStore.fetchSetCards(setId)
+    await setCardsStore.fetchSetCards(setId);
   } catch (error) {
-    console.error('Erreur lors du chargement des détails:', error)
+    console.error('Erreur lors du chargement des détails:', error);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const selectCard = (card: Card) => {
   // TODO: Show card details modal
-  console.log('Card selected:', card)
-}
+  console.log('Card selected:', card);
+};
 
 const openBooster = () => {
   if (!authStore.isLoggedIn) {
-    router.push('/login')
-    return
+    router.push('/login');
+    return;
   }
   // TODO: Implement booster opening logic
-  console.log('Opening booster for set:', set.value?.id)
-}
+  console.log('Opening booster for set:', set.value?.id);
+};
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isCardOwned = (_cardId: string): boolean => {
   // For now, all cards are considered owned until collection integration
-  return true
-}
+  return true;
+};
 
 const getCardImage = (card: Card): string => {
-  return card.image || '/logocard.png'
-}
+  return card.image || '/logocard.png';
+};
 
 // Optimize image URL for WebP if supported
 const getOptimizedCardImage = (card: Card): string => {
-  const originalImage = card.image || '/logocard.png'
+  const originalImage = card.image || '/logocard.png';
 
   // Si c'est une image TCGdx, on peut essayer de l'optimiser
   if (originalImage.includes('tcgdx.net') || originalImage.includes('tcgdex.net')) {
     // Remplacer l'extension par .webp si possible
-    return originalImage.replace(/\.(jpg|jpeg|png)$/i, '.webp')
+    return originalImage.replace(/\.(jpg|jpeg|png)$/i, '.webp');
   }
 
-  return originalImage
-}
+  return originalImage;
+};
 
 // Image error handling
 const handleImageError = (event: Event) => {
-  const img = event.target as HTMLImageElement
-  img.src = '/logocard.png' // Fallback image
-}
+  const img = event.target as HTMLImageElement;
+  img.src = '/logocard.png'; // Fallback image
+};
 
 // Lifecycle
 onMounted(() => {
-  fetchSetDetails()
-})
+  fetchSetDetails();
+});
 </script>
 
 <style scoped>

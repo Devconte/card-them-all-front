@@ -42,20 +42,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useSetsStore } from '@/stores/sets'
-import Navbar from '@/components/Navbar.vue'
-import Footer from '@/components/Footer.vue'
-import type { Set as SetType } from '@/types'
+import { computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useSetsStore } from '@/stores/sets';
+import Navbar from '@/components/Navbar.vue';
+import Footer from '@/components/Footer.vue';
+import type { Set as SetType } from '@/types';
 
-const router = useRouter()
-const setsStore = useSetsStore()
+const router = useRouter();
+const setsStore = useSetsStore();
 
 // Utiliser les données du store
-const series = computed(() => setsStore.latestSets)
-const loading = computed(() => setsStore.isLoading)
-const error = computed(() => setsStore.error)
+const series = computed(() => setsStore.latestSets);
+const loading = computed(() => setsStore.isLoading);
+const error = computed(() => setsStore.error);
 
 const getCardImage = (setName: string): string => {
   // Mapping des noms de sets vers les images disponibles
@@ -67,22 +67,22 @@ const getCardImage = (setName: string): string => {
     'Évolutions Prismatiques': '/évolution prismatique.png',
     'Couronne Stellaire': '/couronnestelaire.png',
     'Étincelles Déferlantes': '/foudreblanche.png',
-  }
+  };
 
-  return imageMap[setName] || '/logocard.png' // Image par défaut
-}
+  return imageMap[setName] || '/logocard.png'; // Image par défaut
+};
 
 const goToSet = (set: SetType) => {
-  router.push(`/sets/${set.id}`)
-}
+  router.push(`/sets/${set.id}`);
+};
 
 const goToSets = () => {
-  router.push('/sets')
-}
+  router.push('/sets');
+};
 
 onMounted(() => {
-  setsStore.fetchSets()
-})
+  setsStore.fetchSets();
+});
 </script>
 
 <style scoped>
