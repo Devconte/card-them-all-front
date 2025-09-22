@@ -1,27 +1,28 @@
 <template>
   <nav class="app-navbar">
-    <div class="navbar-brand">
+    <!-- Section gauche : Logo -->
+    <div class="navbar-left">
       <router-link to="/" class="logo-link">
         <img src="/logocardlong.png" alt="Card Them All" class="logo" />
       </router-link>
     </div>
 
-    <div class="navbar-menu">
-      <router-link to="/sets" class="navbar-item">Sets</router-link>
+    <!-- Section droite : Séries + Collection + Auth -->
+    <div class="navbar-right">
+      <router-link to="/sets" class="navbar-item">Séries</router-link>
       <router-link to="/collection" class="navbar-item">Collection</router-link>
-    </div>
 
-    <div class="navbar-actions">
       <!-- Si connecté -->
       <div v-if="authStore.isAuthenticated" class="user-menu">
-        <span class="user-name">Bonjour {{ authStore.user?.name }}</span>
+        <span class="user-name">{{ authStore.user?.name }}</span>
         <button @click="authStore.logout" class="logout-btn">Déconnexion</button>
       </div>
 
       <!-- Si pas connecté -->
       <div v-else class="auth-buttons">
-        <router-link to="/login" class="login-btn">Connexion</router-link>
-        <router-link to="/register" class="register-btn">Inscription</router-link>
+        <router-link to="/login" class="profile-icon-link">
+          <img src="/Icon profil.png" alt="Se connecter" class="profile-icon" />
+        </router-link>
       </div>
     </div>
   </nav>
@@ -38,16 +39,34 @@ const authStore = useAuthStore();
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 0 80px;
+  height: 127px;
   background: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
 }
 
-.navbar-brand {
+.navbar-left,
+.navbar-center,
+.navbar-right {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
+}
+
+.navbar-left {
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.navbar-center {
+  flex: 0;
+  justify-content: center;
+}
+
+.navbar-right {
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .logo-link {
@@ -56,25 +75,13 @@ const authStore = useAuthStore();
 }
 
 .logo {
-  height: 100px;
-  width: auto;
+  width: 212px;
+  height: 93px;
   transition: transform 0.3s ease;
 }
 
 .logo-link:hover .logo {
   transform: scale(1.05);
-}
-
-.navbar-brand h2 {
-  margin: 0;
-  color: #2c5aa0;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.navbar-menu {
-  display: flex;
-  gap: 2rem;
 }
 
 .navbar-item {
@@ -93,8 +100,20 @@ const authStore = useAuthStore();
 }
 
 .navbar-item.router-link-active {
+  background: transparent;
+  color: #2c5aa0;
+  border-radius: 0;
+  position: relative;
+}
+
+.navbar-item.router-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 20%;
+  width: 60%;
+  height: 3px;
   background: #2c5aa0;
-  color: white;
 }
 
 .navbar-actions {
@@ -202,6 +221,26 @@ const authStore = useAuthStore();
   box-shadow: 0 4px 15px rgba(250, 207, 25, 0.4);
 }
 
+/* Profile icon */
+.profile-icon-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.profile-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.profile-icon-link:hover .profile-icon {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(43, 73, 155, 0.3);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .app-navbar {
@@ -210,12 +249,14 @@ const authStore = useAuthStore();
     padding: 1rem;
   }
 
-  .navbar-menu {
-    gap: 1rem;
+  .navbar-left,
+  .navbar-center,
+  .navbar-right {
+    gap: 0.5rem;
   }
 
-  .navbar-actions {
-    gap: 0.5rem;
+  .navbar-center {
+    order: -1; /* Logo en premier sur mobile */
   }
 }
 </style>
