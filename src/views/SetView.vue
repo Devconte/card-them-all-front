@@ -114,6 +114,7 @@ import { useCollectionStore } from '@/stores/collection';
 import AppNavbar from '@/components/AppNavbar.vue';
 import AppFooter from '@/components/AppFooter.vue';
 import type { Set as SetType } from '@/types';
+import { getSetImage } from '@/utils/setImages';
 
 const router = useRouter();
 const setsStore = useSetsStore();
@@ -168,23 +169,11 @@ const getOwnedCardsCount = (setId: string): number => {
   if (!authStore.isAuthenticated || !collection.value) return 0;
 
   // Compter les cartes de ce set dans la collection
-  return collection.value.filter(
-    (userCard) => userCard.card.set?.id === setId || userCard.card.set?.name === setId,
-  ).length;
+  return collection.value.filter((userCard) => userCard.card.set?.name === setId).length;
 };
 
 const getSerieImage = (serieName: string): string => {
-  const imageMap: Record<string, string> = {
-    'Foudre Noire': '/foudrenoire.png',
-    'Flamme Blanche': '/foudreblanche.png',
-    'Rivalités Destinées': '/rivalitedestine.png',
-    'Aventures Ensemble': '/aventuresnesemble.png',
-    'Évolutions Prismatiques': '/évolution prismatique.png',
-    'Couronne Stellaire': '/couronnestelaire.png',
-    'Étincelles Déferlantes': '/foudreblanche.png',
-  };
-
-  return imageMap[serieName] || '/logocard.png';
+  return getSetImage(serieName);
 };
 
 const goToSet = (set: SetType) => {
