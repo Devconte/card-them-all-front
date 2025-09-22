@@ -18,7 +18,7 @@
             placeholder="Rechercher un set..."
             class="search-input"
           />
-          <div class="search-icon">🔍</div>
+          <img src="/loupe.png" alt="Rechercher" class="search-icon" />
         </div>
       </div>
     </section>
@@ -233,25 +233,17 @@ onMounted(() => {
 
 <style scoped>
 .series {
-  min-height: 100vh;
   background: #f8f9fa;
+  padding: 0 40px; /* Padding global pour tout le contenu */
 }
 
 /* Header Section */
 .series-header {
-  background: white;
-  background-image: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 2px,
-    rgba(255, 192, 203, 0.1) 2px,
-    rgba(255, 192, 203, 0.1) 4px
-  );
-  padding: 2rem 80px;
+  padding: 2rem 0; /* Pas de padding horizontal, géré par .series */
 }
 
 .header-content {
-  max-width: 1400px;
+  max-width: 1680px;
   margin: 0 auto;
   display: flex;
   justify-content: flex-start;
@@ -284,7 +276,7 @@ onMounted(() => {
   display: flex;
   justify-content: flex-start;
   width: 100%;
-  max-width: 1400px;
+  max-width: 1680px;
   margin: 0 auto;
 }
 
@@ -295,7 +287,7 @@ onMounted(() => {
 }
 
 .search-input {
-  width: 100%;
+  width: 90%;
   padding: 0.6rem 2rem 0.6rem 1rem;
   border: none;
   border-radius: 8px;
@@ -316,19 +308,20 @@ onMounted(() => {
 
 .search-icon {
   position: absolute;
-  right: 1rem;
+  right: 0;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1rem;
-  color: #666;
+  width: 16px;
+  height: 16px;
   pointer-events: none;
   z-index: 1;
+  margin-right: 0;
 }
 
 /* Main Content */
 .main-content {
-  padding: 2rem 80px;
-  max-width: 1400px;
+  padding: 2rem 0; /* Pas de padding horizontal, géré par .series */
+  max-width: 1680px;
   margin: 0 auto;
   background: #f8f9fa;
 }
