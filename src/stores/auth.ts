@@ -98,20 +98,6 @@ export const useAuthStore = defineStore('auth', () => {
       // Configurer axios pour les requêtes suivantes
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
-      // Debug
-      console.log('✅ Login successful!');
-      console.log('🔑 Access token:', access_token);
-      console.log('🔄 Refresh token:', refresh_token);
-      console.log('👤 User:', userData);
-
-      // Vérifier le stockage
-      console.log('📦 Token in sessionStorage:', sessionStorage.getItem('access_token'));
-      console.log('📦 Refresh token in sessionStorage:', sessionStorage.getItem('refresh_token'));
-      console.log('📦 User in sessionStorage:', sessionStorage.getItem('user'));
-
-      // Vérifier axios headers
-      console.log('🌐 Axios Authorization header:', axios.defaults.headers.common['Authorization']);
-
       return true;
     } catch (err: unknown) {
       const axiosError = err as AxiosError;
@@ -136,8 +122,6 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
 
     try {
-      console.log('Attempting registration with:', { email, username });
-
       const response = await axios.post('/auth/register', {
         email,
         password,
@@ -145,7 +129,6 @@ export const useAuthStore = defineStore('auth', () => {
         username,
       });
 
-      console.log('Registration response:', response.data);
       const { user: userData, access_token, refresh_token } = response.data;
 
       // Mettre à jour l'état
@@ -161,12 +144,6 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Configurer axios
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-
-      // Debug
-      console.log('✅ Registration successful!');
-      console.log('🔑 Access token:', access_token);
-      console.log('🔄 Refresh token:', refresh_token);
-      console.log('👤 User:', userData);
 
       return true;
     } catch (err: unknown) {
