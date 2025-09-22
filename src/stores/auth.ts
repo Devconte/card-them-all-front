@@ -82,7 +82,9 @@ export const useAuthStore = defineStore('auth', () => {
         password,
       });
 
-      const { user: userData, access_token, refresh_token } = response.data;
+      // Les tokens sont dans response.data.data, l'utilisateur dans response.data.user
+      const { access_token, refresh_token } = response.data.data || {};
+      const userData = response.data.user;
 
       // Mettre à jour l'état
       isLoggedIn.value = true;
@@ -188,7 +190,8 @@ export const useAuthStore = defineStore('auth', () => {
 
         // Configurer axios
         axios.defaults.headers.common['Authorization'] = `Bearer ${savedAccessToken}`;
-      } catch {
+      } catch (error) {
+        console.error('❌ Error parsing saved auth data:', error);
         // Si erreur de parsing, nettoyer
         logout();
       }
