@@ -5,7 +5,12 @@
     <!-- Header Section -->
     <section class="series-header">
       <div class="header-content">
-        <h1 class="page-title">SETS</h1>
+        <div class="title-container">
+          <img src="/pokeball.png" alt="Pokéball" class="pokeball-icon" />
+          <h1 class="page-title">SETS</h1>
+        </div>
+      </div>
+      <div class="search-section">
         <div class="search-container">
           <input
             v-model="searchQuery"
@@ -35,38 +40,57 @@
       <!-- Sets Content -->
       <div v-else class="sets-content">
         <!-- Grouped by Series -->
-        <div v-for="serie in groupedSets" :key="serie.name" class="serie-section">
-          <h2 class="serie-title">{{ serie.name }}</h2>
-          <div class="sets-grid">
-            <div
-              v-for="set in serie.displayedSets"
-              :key="set.id"
-              class="set-card"
-              @click="goToSet(set)"
-            >
-              <img :src="getSerieImage(set.name)" :alt="set.name" class="set-image" />
-              <div class="set-name">
-                <div class="set-title">{{ set.name }}</div>
-                <div class="set-details">
-                  <span class="set-date">{{ formatDate(set.releaseDate || null) }}</span>
-                  <span v-if="set.cardCount" class="set-cards"
-                    >{{ set.cardCount.total }} cartes</span
-                  >
+        <div
+          v-for="serie in groupedSets"
+          :key="serie.name"
+          class="serie-section"
+          :data-serie="serie.name"
+        >
+          <!-- Serie title with yellow bar on the right -->
+          <div class="serie-header">
+            <h2 class="serie-title">{{ formatSerieName(serie.name) }}</h2>
+            <div class="yellow-bar-right"></div>
+          </div>
+          <div class="sets-slider">
+            <div class="sets-container">
+              <div
+                v-for="set in serie.displayedSets"
+                :key="set.id"
+                class="set-card"
+                @click="goToSet(set)"
+              >
+                <img :src="getSerieImage(set.name)" :alt="set.name" class="set-image" />
+                <div class="set-info">
+                  <div class="set-title">
+                    <span class="serie-name">{{ set.name }}</span> -
+                    <span v-if="!authStore.isAuthenticated" class="card-count"
+                      >{{ set.cardCount?.total || 0 }} cartes</span
+                    >
+                    <span v-else class="card-counter">
+                      <span class="owned-count">0</span>/<span class="total-count">{{
+                        set.cardCount?.total || 0
+                      }}</span>
+                      cartes
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
+            <div v-if="serie.hasMore" class="slider-arrows">
+              <button
+                v-if="canScrollLeft(serie.name)"
+                @click="scrollSliderLeft(serie.name)"
+                class="arrow-btn arrow-left"
+              >
+                <
+              </button>
+              <button @click="scrollSliderRight(serie.name)" class="arrow-btn arrow-right">
+                >
+              </button>
+            </div>
           </div>
-
-          <!-- Bouton "Voir plus" si nécessaire -->
-          <div v-if="serie.hasMore" class="view-more-section">
-            <button @click="toggleSeries(serie.name)" class="view-more-btn">
-              {{
-                expandedSeries.has(serie.name)
-                  ? 'Voir moins'
-                  : `Voir plus (${serie.totalSets - 4} autres)`
-              }}
-            </button>
-          </div>
+          <!-- Yellow bar below sets -->
+          <div class="yellow-bar-below-sets"></div>
         </div>
 
         <!-- No Results -->
@@ -81,19 +105,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useSetsStore } from '@/stores/sets';
+import { useAuthStore } from '@/stores/auth';
 import AppNavbar from '@/components/AppNavbar.vue';
 import AppFooter from '@/components/AppFooter.vue';
 import type { Set as SetType } from '@/types';
 
 const router = useRouter();
 const setsStore = useSetsStore();
+const authStore = useAuthStore();
 
 // Reactive data
 const searchQuery = ref<string>('');
 const expandedSeries = ref<Set<string>>(new Set());
+const scrollPositions = ref<Record<string, number>>({});
 
 // Utiliser les données du store
 const loading = computed(() => setsStore.isLoading);
@@ -122,8 +149,8 @@ const groupedSets = computed(() => {
       name,
       sets,
       totalSets: sets.length,
-      displayedSets: expandedSeries.value.has(name) ? sets : sets.slice(0, 4),
-      hasMore: sets.length > 4,
+      displayedSets: sets, // Afficher TOUS les sets dans le slider
+      hasMore: sets.length > 4, // Garder hasMore pour la flèche
       latestDate: Math.max(...sets.map((set) => new Date(set.releaseDate || 0).getTime())),
     }))
     .sort((a, b) => b.latestDate - a.latestDate); // Most recent first
@@ -164,9 +191,60 @@ const toggleSeries = (serieName: string) => {
   }
 };
 
+const scrollSliderLeft = (serieName: string) => {
+  const slider = document.querySelector(
+    `[data-serie="${serieName}"] .sets-container`,
+  ) as HTMLElement;
+  if (slider) {
+    slider.scrollBy({ left: -380, behavior: 'smooth' }); // Scroll vers la gauche
+    // Mettre à jour la position après le scroll
+    setTimeout(() => {
+      scrollPositions.value[serieName] = slider.scrollLeft;
+    }, 100);
+  }
+};
+
+const scrollSliderRight = (serieName: string) => {
+  const slider = document.querySelector(
+    `[data-serie="${serieName}"] .sets-container`,
+  ) as HTMLElement;
+  if (slider) {
+    slider.scrollBy({ left: 380, behavior: 'smooth' }); // Scroll vers la droite
+    // Mettre à jour la position après le scroll
+    setTimeout(() => {
+      scrollPositions.value[serieName] = slider.scrollLeft;
+    }, 100);
+  }
+};
+
+const canScrollLeft = (serieName: string): boolean => {
+  return (scrollPositions.value[serieName] || 0) > 0;
+};
+
+const formatSerieName = (name: string): string => {
+  return name
+    .toLowerCase()
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 // Lifecycle
 onMounted(() => {
   setsStore.fetchSets();
+
+  // Ajouter des listeners pour détecter le scroll manuel
+  nextTick(() => {
+    const sliders = document.querySelectorAll('.sets-container');
+    sliders.forEach((slider) => {
+      slider.addEventListener('scroll', () => {
+        const serieName = slider.closest('[data-serie]')?.getAttribute('data-serie');
+        if (serieName) {
+          scrollPositions.value[serieName] = slider.scrollLeft;
+        }
+      });
+    });
+  });
 });
 </script>
 
@@ -178,21 +256,41 @@ onMounted(() => {
 
 /* Header Section */
 .series-header {
-  background: linear-gradient(135deg, #2b499b 0%, #1e3d6f 100%);
-  padding: 2rem;
+  background: white;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 192, 203, 0.1) 2px,
+    rgba(255, 192, 203, 0.1) 4px
+  );
+  padding: 2rem 0;
 }
 
 .header-content {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1.5rem;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pokeball-icon {
+  width: 40px;
+  height: 40px;
 }
 
 .page-title {
-  color: white;
+  color: black;
   font-family: 'Luckiest Guy', cursive;
   font-size: 35px;
   margin: 0;
@@ -200,27 +298,39 @@ onMounted(() => {
   letter-spacing: 2px;
 }
 
+.search-section {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
 .search-container {
   position: relative;
   max-width: 300px;
-  flex-shrink: 0;
+  width: 100%;
 }
 
 .search-input {
   width: 100%;
-  padding: 0.8rem 2.5rem 0.8rem 1.2rem;
+  padding: 0.6rem 2rem 0.6rem 1rem;
   border: none;
-  border-radius: 50px;
-  font-size: 1rem;
-  background: white;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #2b499b;
+  color: white;
   transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .search-input:focus {
   outline: none;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px rgba(43, 73, 155, 0.3);
 }
 
 .search-icon {
@@ -236,7 +346,7 @@ onMounted(() => {
 
 /* Main Content */
 .main-content {
-  padding: 2rem;
+  padding: 2rem 1rem;
   max-width: 1200px;
   margin: 0 auto;
   background: #f8f9fa;
@@ -244,31 +354,98 @@ onMounted(() => {
 
 /* Serie Section */
 .serie-section {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e0e0e0;
+  margin-bottom: 3rem;
+}
+
+.serie-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 10rem;
 }
 
 .serie-title {
-  font-family: 'Luckiest Guy', cursive;
+  font-family: 'Montserrat Alternates', sans-serif;
   font-size: 35px;
-  color: #2b499b;
-  margin: 0 0 2rem 0;
-  text-transform: uppercase;
+  font-weight: 600;
+  color: black;
+  margin: 0;
+  white-space: nowrap;
   letter-spacing: 1px;
-  border-bottom: 3px solid #facf19;
-  padding-bottom: 0.5rem;
-  display: inline-block;
 }
 
-/* Sets Grid */
-.sets-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+.yellow-bar-right {
+  background: #facf19;
+  height: 3px;
+  width: 60%;
+  border-radius: 2px;
+}
+
+.yellow-bar-below-sets {
+  background: #facf19;
+  height: 3px;
+  width: 60%;
+  margin-top: 1rem;
+  border-radius: 2px;
+}
+
+/* Sets Slider */
+.sets-slider {
+  position: relative;
+  overflow: hidden;
+}
+
+.sets-container {
+  display: flex;
   gap: 1.5rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 1rem 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x mandatory;
+}
+
+.sets-container::-webkit-scrollbar {
+  display: none;
+}
+
+.slider-arrows {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 100%;
+  pointer-events: none;
+}
+
+.arrow-left {
+  position: absolute;
+  left: 0;
+  pointer-events: auto;
+}
+
+.arrow-right {
+  position: absolute;
+  right: 0;
+  pointer-events: auto;
+}
+
+.arrow-btn {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.arrow-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
 }
 
 .set-card {
@@ -280,7 +457,9 @@ onMounted(() => {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  height: 325px; /* Hauteur fixe pour toutes les cartes */
+  min-width: 380px; /* Plus large pour éviter le débordement */
+  max-width: 380px;
+  height: 220px; /* Un peu plus haut */
 }
 
 .set-card:hover {
@@ -290,18 +469,18 @@ onMounted(() => {
 
 .set-image {
   width: 100%;
-  height: 240px;
+  height: 160px; /* Plus haut */
   object-fit: cover;
   object-position: center;
   flex-shrink: 0;
 }
 
-.set-name {
+.set-info {
   background: #2b499b;
   color: white;
-  padding: 0.8rem 1rem;
+  padding: 1rem;
   text-align: center;
-  height: 85px;
+  height: 60px; /* Garde la même hauteur */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -309,11 +488,36 @@ onMounted(() => {
 }
 
 .set-title {
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-family: 'Montserrat Alternates', sans-serif;
   line-height: 1.3;
-  margin-bottom: 0.5rem;
+  margin: 0;
+}
+
+.serie-name {
+  font-size: 18px;
+  font-weight: 500; /* Medium - moins gras */
+  white-space: nowrap; /* Force sur une ligne */
+  overflow: hidden;
+  text-overflow: ellipsis; /* ... si trop long */
+}
+
+.card-count {
+  font-size: 15px;
+  font-weight: 400; /* Normal */
+}
+
+.card-counter {
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.owned-count {
+  color: #facf19; /* Jaune pour les cartes possédées */
+  font-weight: 600;
+}
+
+.total-count {
+  color: rgba(255, 255, 255, 0.8); /* Gris pour le total */
 }
 
 .set-details {
@@ -325,33 +529,6 @@ onMounted(() => {
   margin-top: 0.3rem;
   gap: 0.5rem;
   flex-wrap: wrap;
-}
-
-/* View More Section */
-.view-more-section {
-  text-align: center;
-  margin-top: 2rem;
-}
-
-.view-more-btn {
-  background: #facf19;
-  color: #2b499b;
-  border: none;
-  padding: 0.8rem 2rem;
-  border-radius: 25px;
-  font-family: 'Montserrat Alternates', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.view-more-btn:hover {
-  background: #e6ba00;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(250, 207, 25, 0.3);
 }
 
 /* Loading State */
@@ -411,40 +588,174 @@ onMounted(() => {
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+  .header-content,
+  .search-section,
+  .main-content {
+    padding: 0 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
   .series-header {
-    padding: 1.5rem 1rem;
+    padding: 1.5rem 0;
   }
 
   .header-content {
-    gap: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
     text-align: left;
+    gap: 0.5rem;
+  }
+
+  .title-container {
+    gap: 0.5rem;
+  }
+
+  .pokeball-icon {
+    width: 32px;
+    height: 32px;
   }
 
   .page-title {
     font-size: 28px;
   }
 
+  .search-section {
+    margin-top: 0.5rem;
+  }
+
   .search-container {
-    max-width: 100%;
+    max-width: 250px;
+  }
+
+  .search-input {
+    padding: 0.5rem 1.5rem 0.5rem 0.8rem;
+    font-size: 0.85rem;
   }
 
   .main-content {
-    padding: 1rem;
+    padding: 1.5rem 1rem;
   }
 
   .serie-section {
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
   }
 
-  .sets-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
+  .serie-header {
+    margin-bottom: 0.8rem;
+    gap: 1rem;
   }
 
   .serie-title {
-    font-size: 28px;
+    font-size: 24px;
+  }
+
+  .yellow-bar-right,
+  .yellow-bar-below-sets {
+    width: 50%;
+  }
+
+  .set-card {
+    min-width: 280px;
+    max-width: 280px;
+    height: 200px;
+  }
+
+  .set-image {
+    height: 140px;
+  }
+
+  .set-info {
+    height: 60px;
+    padding: 0.8rem;
+  }
+
+  .serie-name {
+    font-size: 16px;
+  }
+
+  .card-count {
+    font-size: 14px;
+  }
+
+  .arrow-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+  }
+
+  .slider-arrows {
+    right: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .series-header {
+    padding: 1rem 0;
+  }
+
+  .header-content {
+    padding: 0 1rem;
+  }
+
+  .search-section {
+    padding: 0 1rem;
+  }
+
+  .search-container {
+    max-width: 200px;
+  }
+
+  .main-content {
+    padding: 1rem 0.5rem;
+  }
+
+  .pokeball-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .serie-title {
+    font-size: 20px;
+  }
+
+  .yellow-bar-right,
+  .yellow-bar-below-sets {
+    width: 40%;
+  }
+
+  .set-card {
+    min-width: 240px;
+    max-width: 240px;
+    height: 180px;
+  }
+
+  .set-image {
+    height: 120px;
+  }
+
+  .set-info {
+    height: 60px;
+    padding: 0.6rem;
+  }
+
+  .serie-name {
+    font-size: 14px;
+  }
+
+  .card-count {
+    font-size: 12px;
+  }
+
+  .arrow-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
   }
 }
 </style>
