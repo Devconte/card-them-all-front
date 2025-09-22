@@ -17,6 +17,10 @@ export interface Set {
   logo?: string | null;
   symbol?: string | null;
   releaseDate?: string | null;
+  cardCount?: {
+    total: number;
+    official: number;
+  };
   serie?: Serie;
 }
 
