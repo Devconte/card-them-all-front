@@ -119,7 +119,7 @@ const authStore = useAuthStore();
 
 // Reactive data
 const searchQuery = ref<string>('');
-const expandedSeries = ref<Set<string>>(new Set());
+
 const scrollPositions = ref<Record<string, number>>({});
 
 // Utiliser les données du store
@@ -170,25 +170,8 @@ const getSerieImage = (serieName: string): string => {
   return imageMap[serieName] || '/logocard.png';
 };
 
-const formatDate = (dateString: string | null): string => {
-  if (!dateString) return 'Date inconnue';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('fr-FR', {
-    year: 'numeric',
-    month: 'long',
-  });
-};
-
 const goToSet = (set: SetType) => {
   router.push(`/sets/${set.id}`);
-};
-
-const toggleSeries = (serieName: string) => {
-  if (expandedSeries.value.has(serieName)) {
-    expandedSeries.value.delete(serieName);
-  } else {
-    expandedSeries.value.add(serieName);
-  }
 };
 
 const scrollSliderLeft = (serieName: string) => {
