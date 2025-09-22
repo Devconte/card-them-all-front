@@ -5,9 +5,19 @@
     <!-- Header Section -->
     <section class="detail-header">
       <div class="header-content">
-        <h1 class="page-title">{{ set?.name || 'Série' }}</h1>
+        <h1 class="page-title">
+          <img src="/pokeball.png" alt="Pokéball" class="pokeball-icon" />
+          {{ set?.name || 'Série' }}
+        </h1>
         <div class="header-actions">
-          <span class="card-count">{{ cards.length }} cartes</span>
+          <span v-if="!authStore.isAuthenticated" class="card-count"
+            >{{ cards.length }} cartes</span
+          >
+          <span v-else class="card-counter">
+            <span class="owned-count">{{ getTotalOwnedCards() }}</span
+            >/<span class="total-count">{{ cards.length }}</span>
+            cartes
+          </span>
         </div>
       </div>
     </section>
@@ -61,10 +71,6 @@
 
         <!-- Cards Grid -->
         <div class="cards-content">
-          <div class="cards-header">
-            <h2 class="cards-title">Collection</h2>
-          </div>
-
           <!-- Loading State -->
           <div v-if="loading || isLoading" class="loading">
             <div class="loading-spinner"></div>
@@ -83,6 +89,7 @@
               v-for="card in filteredCards"
               :key="card.id"
               class="card-item"
+              :class="{ 'card-not-owned': !hasCard(card.id) && authStore.isAuthenticated }"
               @click="selectCard(card)"
             >
               <picture>
@@ -91,12 +98,18 @@
                   :src="getCardImage(card)"
                   :alt="card.name"
                   class="card-image"
+                  :class="{ 'image-grayscale': !hasCard(card.id) && authStore.isAuthenticated }"
                   loading="lazy"
                   @error="handleImageError"
                 />
               </picture>
               <div class="card-info">
-                <h4 class="card-name">{{ card.name }}</h4>
+                <div class="card-name-row">
+                  <h4 class="card-name">{{ card.name }}</h4>
+                  <span v-if="authStore.isAuthenticated" class="card-quantity">
+                    x{{ getUserCardQuantity(card.id) }}
+                  </span>
+                </div>
                 <p class="card-rarity">{{ card.rarity?.name || 'N/A' }}</p>
               </div>
             </div>
@@ -116,9 +129,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
 import { useRoute, useRouter } from 'vue-router';
 import { useSetCardsStore } from '@/stores/setCards';
 import { useAuthStore } from '@/stores/auth';
+import { useCollectionStore } from '@/stores/collection';
 import AppNavbar from '@/components/AppNavbar.vue';
 import AppFooter from '@/components/AppFooter.vue';
 import type { Set as SetType, Card } from '@/types';
@@ -127,6 +142,7 @@ const route = useRoute();
 const router = useRouter();
 const setCardsStore = useSetCardsStore();
 const authStore = useAuthStore();
+const collectionStore = useCollectionStore();
 
 // Reactive data
 const loading = ref<boolean>(false);
@@ -138,6 +154,32 @@ const selectedRarities = ref<string[]>([]);
 const cards = computed(() => setCardsStore.getSetCards(route.params.id as string));
 const isLoading = computed(() => setCardsStore.isLoading(route.params.id as string));
 const error = computed(() => setCardsStore.getError(route.params.id as string));
+
+// Collection data
+const { collection } = storeToRefs(collectionStore);
+const { fetchCollection } = collectionStore;
+
+// Fonction pour vérifier si l'utilisateur possède une carte
+const getUserCardQuantity = (cardId: string): number => {
+  if (!authStore.isAuthenticated || !collection.value) return 0;
+  const userCard = collection.value.find((uc) => uc.cardId === cardId);
+  return userCard ? userCard.quantity : 0;
+};
+
+// Fonction pour vérifier si l'utilisateur possède une carte
+const hasCard = (cardId: string): boolean => {
+  return getUserCardQuantity(cardId) > 0;
+};
+
+// Fonction pour calculer le total de cartes possédées dans ce set
+const getTotalOwnedCards = (): number => {
+  if (!authStore.isAuthenticated || !collection.value) return 0;
+
+  // Compter toutes les cartes de ce set dans la collection
+  return collection.value.filter((userCard) =>
+    cards.value.some((card) => card.id === userCard.cardId),
+  ).length;
+};
 
 // Cartes filtrées par recherche uniquement (pour les rarités disponibles)
 const searchFilteredCards = computed(() => {
@@ -250,6 +292,11 @@ const handleImageError = (event: Event) => {
 // Lifecycle
 onMounted(() => {
   fetchSetDetails();
+
+  // Charger la collection si l'utilisateur est connecté
+  if (authStore.isAuthenticated) {
+    fetchCollection();
+  }
 });
 </script>
 
@@ -280,6 +327,14 @@ onMounted(() => {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pokeball-icon {
+  width: 32px;
+  height: 32px;
 }
 
 .header-actions {
@@ -295,6 +350,24 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.1);
   padding: 0.5rem 1rem;
   border-radius: 20px;
+}
+
+.card-counter {
+  color: white;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 17px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+}
+
+.owned-count {
+  color: #facf19;
+  font-weight: 600;
+}
+
+.total-count {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* Main Content */
@@ -539,6 +612,30 @@ onMounted(() => {
   font-size: 13px;
   color: #666;
   margin: 0;
+}
+
+/* Card ownership styles */
+.card-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.card-quantity {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 13px;
+  color: #333;
+  font-weight: 600;
+}
+
+.card-not-owned {
+  opacity: 0.7;
+}
+
+.image-grayscale {
+  filter: grayscale(100%);
+  opacity: 0.5;
 }
 
 /* Loading State */

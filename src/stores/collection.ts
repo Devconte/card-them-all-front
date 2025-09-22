@@ -47,9 +47,10 @@ export const useCollectionStore = defineStore('collection', () => {
       });
 
       collection.value = response.data || [];
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('❌ Error fetching collection:', err);
-      error.value = err.response?.data?.message || err.message || 'Erreur lors du chargement';
+      const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement';
+      error.value = errorMessage;
     } finally {
       loading.value = false;
     }

@@ -67,9 +67,8 @@
                       >{{ set.cardCount?.total || 0 }} cartes</span
                     >
                     <span v-else class="card-counter">
-                      <span class="owned-count">0</span>/<span class="total-count">{{
-                        set.cardCount?.total || 0
-                      }}</span>
+                      <span class="owned-count">{{ getOwnedCardsCount(set.id) }}</span
+                      >/<span class="total-count">{{ set.cardCount?.total || 0 }}</span>
                       cartes
                     </span>
                   </div>
@@ -107,9 +106,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue';
+import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useSetsStore } from '@/stores/sets';
 import { useAuthStore } from '@/stores/auth';
+import { useCollectionStore } from '@/stores/collection';
 import AppNavbar from '@/components/AppNavbar.vue';
 import AppFooter from '@/components/AppFooter.vue';
 import type { Set as SetType } from '@/types';
@@ -117,6 +118,11 @@ import type { Set as SetType } from '@/types';
 const router = useRouter();
 const setsStore = useSetsStore();
 const authStore = useAuthStore();
+const collectionStore = useCollectionStore();
+
+// Collection data
+const { collection } = storeToRefs(collectionStore);
+const { fetchCollection } = collectionStore;
 
 // Reactive data
 const searchQuery = ref<string>('');
@@ -156,6 +162,16 @@ const groupedSets = computed(() => {
     }))
     .sort((a, b) => b.latestDate - a.latestDate); // Most recent first
 });
+
+// Fonction pour calculer le nombre de cartes possédées pour un set
+const getOwnedCardsCount = (setId: string): number => {
+  if (!authStore.isAuthenticated || !collection.value) return 0;
+
+  // Compter les cartes de ce set dans la collection
+  return collection.value.filter(
+    (userCard) => userCard.card.set?.id === setId || userCard.card.set?.name === setId,
+  ).length;
+};
 
 const getSerieImage = (serieName: string): string => {
   const imageMap: Record<string, string> = {
@@ -216,6 +232,11 @@ const formatSerieName = (name: string): string => {
 // Lifecycle
 onMounted(() => {
   setsStore.fetchSets();
+
+  // Charger la collection si l'utilisateur est connecté
+  if (authStore.isAuthenticated) {
+    fetchCollection();
+  }
 
   // Ajouter des listeners pour détecter le scroll manuel
   nextTick(() => {
