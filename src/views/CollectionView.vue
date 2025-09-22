@@ -24,49 +24,108 @@
       <!-- Si connecté : contenu de la collection -->
       <div v-else>
         <div class="collection-header">
-          <h1>Ma Collection</h1>
+          <div class="title-container">
+            <img src="/pokeball.png" alt="Pokéball" class="pokeball-icon" />
+            <h1>Ma Collection</h1>
+          </div>
           <div class="collection-stats">
-            <span class="total-cards">{{ collection.length }} cartes</span>
+            <span class="total-cards">{{ filteredCollection.length }} cartes</span>
           </div>
         </div>
 
-        <!-- Loading state -->
-        <div v-if="loading" class="loading">
-          <div class="loading-spinner"></div>
-          <p>Chargement de votre collection...</p>
-        </div>
-
-        <!-- Error state -->
-        <div v-else-if="error" class="error">
-          <p>Erreur : {{ error }}</p>
-          <button @click="fetchCollection" class="retry-btn">Réessayer</button>
-        </div>
-
-        <!-- Empty state -->
-        <div v-else-if="collection.length === 0" class="empty-state">
-          <h2>Votre collection est vide</h2>
-          <p>Ouvrez des boosters pour commencer votre collection !</p>
-        </div>
-
-        <!-- Collection content -->
-        <div v-else class="collection-content">
-          <div class="cards-grid">
-            <div v-for="userCard in collection" :key="userCard.id" class="card-item">
-              <div class="card-image-container">
-                <img
-                  :src="getCardImage(userCard)"
-                  :alt="userCard.card.name"
-                  class="card-image"
-                  @error="handleImageError"
+        <div class="content-layout">
+          <!-- Sidebar Filters -->
+          <aside class="sidebar">
+            <div class="filters-container">
+              <!-- Search -->
+              <div class="filter-section">
+                <input
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="Rechercher une carte..."
+                  class="search-input"
                 />
-                <div v-if="userCard.quantity > 1" class="quantity-badge">
-                  {{ userCard.quantity }}
+              </div>
+
+              <!-- Series Filter -->
+              <div class="filter-section">
+                <h3 class="filter-title">Série</h3>
+                <div class="filter-options">
+                  <label v-for="serie in availableSeries" :key="serie" class="checkbox-option">
+                    <input
+                      type="checkbox"
+                      :value="serie"
+                      v-model="selectedSeries"
+                      class="checkbox-input"
+                    />
+                    <span class="checkbox-label">{{ serie }}</span>
+                  </label>
                 </div>
               </div>
-              <div class="card-info">
-                <h3 class="card-name">{{ userCard.card.name }}</h3>
-                <p class="card-rarity">{{ userCard.card.rarity?.name || 'N/A' }}</p>
-                <p class="card-set">{{ userCard.card.set?.name || 'N/A' }}</p>
+
+              <!-- Rarity Filter -->
+              <div class="filter-section">
+                <h3 class="filter-title">Rareté</h3>
+                <div class="filter-options">
+                  <label v-for="rarity in availableRarities" :key="rarity" class="checkbox-option">
+                    <input
+                      type="checkbox"
+                      :value="rarity"
+                      v-model="selectedRarities"
+                      class="checkbox-input"
+                    />
+                    <span class="checkbox-label">{{ rarity }}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Cards Content -->
+          <div class="cards-content">
+            <!-- Loading state -->
+            <div v-if="loading" class="loading">
+              <div class="loading-spinner"></div>
+              <p>Chargement de votre collection...</p>
+            </div>
+
+            <!-- Error state -->
+            <div v-else-if="error" class="error">
+              <p>Erreur : {{ error }}</p>
+              <button @click="fetchCollection" class="retry-btn">Réessayer</button>
+            </div>
+
+            <!-- Empty state -->
+            <div v-else-if="collection.length === 0" class="empty-state">
+              <h2>Votre collection est vide</h2>
+              <p>Ouvrez des boosters pour commencer votre collection !</p>
+            </div>
+
+            <!-- No results -->
+            <div v-else-if="filteredCollection.length === 0" class="no-results">
+              <p>Aucune carte trouvée avec ces filtres</p>
+            </div>
+
+            <!-- Collection content -->
+            <div v-else class="cards-grid">
+              <div v-for="userCard in filteredCollection" :key="userCard.id" class="card-item">
+                <div class="card-image-container">
+                  <img
+                    :src="getCardImage(userCard)"
+                    :alt="userCard.card.name"
+                    class="card-image"
+                    @error="handleImageError"
+                  />
+                  <div v-if="userCard.quantity > 1" class="quantity-badge">
+                    {{ userCard.quantity }}
+                  </div>
+                </div>
+                <div class="card-info">
+                  <div class="card-name-row">
+                    <h4 class="card-name">{{ userCard.card.name }}</h4>
+                    <span class="card-count">x{{ userCard.quantity }}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -79,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from 'vue';
+import { onMounted, watch, computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useCollectionStore } from '@/stores/collection';
 import { useAuthStore } from '@/stores/auth';
@@ -112,6 +171,59 @@ const authStore = useAuthStore();
 const { collection, loading, error } = storeToRefs(collectionStore);
 // Utiliser directement pour les actions
 const { fetchCollection } = collectionStore;
+
+// Filtres
+const searchQuery = ref('');
+const selectedSeries = ref<string[]>([]);
+const selectedRarities = ref<string[]>([]);
+
+// Computed pour les options de filtres
+const availableSeries = computed(() => {
+  const series = new Set<string>();
+  collection.value.forEach((userCard) => {
+    if (userCard.card.set?.name) {
+      series.add(userCard.card.set.name);
+    }
+  });
+  return Array.from(series).sort();
+});
+
+const availableRarities = computed(() => {
+  const rarities = new Set<string>();
+  collection.value.forEach((userCard) => {
+    if (userCard.card.rarity?.name) {
+      rarities.add(userCard.card.rarity.name);
+    }
+  });
+  return Array.from(rarities).sort();
+});
+
+// Computed pour les cartes filtrées
+const filteredCollection = computed(() => {
+  let filtered = collection.value;
+
+  // Filtre par recherche
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    filtered = filtered.filter((userCard) => userCard.card.name.toLowerCase().includes(query));
+  }
+
+  // Filtre par série
+  if (selectedSeries.value.length > 0) {
+    filtered = filtered.filter((userCard) =>
+      selectedSeries.value.includes(userCard.card.set?.name || ''),
+    );
+  }
+
+  // Filtre par rareté
+  if (selectedRarities.value.length > 0) {
+    filtered = filtered.filter((userCard) =>
+      selectedRarities.value.includes(userCard.card.rarity?.name || ''),
+    );
+  }
+
+  return filtered;
+});
 
 // Charger les données au montage
 onMounted(() => {
@@ -154,9 +266,15 @@ const handleImageError = (event: Event) => {
 }
 
 .main-content {
-  max-width: 1200px;
+  max-width: 1680px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 40px;
+}
+
+.content-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
 }
 
 .collection-header {
@@ -166,23 +284,38 @@ const handleImageError = (event: Event) => {
   margin-bottom: 2rem;
 }
 
+.title-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pokeball-icon {
+  width: 40px;
+  height: 40px;
+}
+
 .collection-header h1 {
-  font-size: 2.5rem;
-  color: #2c5aa0;
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 35px;
+  color: black;
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .collection-stats {
   background: white;
   padding: 1rem 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(43, 73, 155, 0.15);
 }
 
 .total-cards {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #2c5aa0;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: #2b499b;
 }
 
 .loading,
@@ -223,35 +356,36 @@ const handleImageError = (event: Event) => {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
 }
 
 .card-item {
   background: white;
-  border-radius: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .card-item:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
 .card-image-container {
   position: relative;
-  height: 300px;
-  overflow: hidden;
 }
 
 .quantity-badge {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: #ff4757;
-  color: white;
+  background: #facf19;
+  color: #2b499b;
   border-radius: 50%;
   width: 24px;
   height: 24px;
@@ -259,37 +393,143 @@ const handleImageError = (event: Event) => {
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 2px solid #2b499b;
 }
 
 .card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .card-info {
   padding: 1rem;
 }
 
+.card-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .card-name {
-  font-size: 1.1rem;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 15px;
   font-weight: 600;
-  margin: 0 0 0.5rem 0;
+  color: #2b499b;
+  margin: 0;
+  flex: 1;
+}
+
+.card-count {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filter-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2b499b;
+  margin: 0;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #2b499b;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+}
+
+.checkbox-input {
+  margin: 0;
+  accent-color: #2b499b;
+}
+
+.checkbox-label {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 14px;
   color: #333;
 }
 
-.card-rarity {
-  color: #666;
-  margin: 0 0 0.25rem 0;
-  font-size: 0.9rem;
+/* Cards Content */
+.cards-content {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.card-set {
-  color: #888;
-  margin: 0;
-  font-size: 0.8rem;
+.no-results {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #666;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 17px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .sidebar {
+    order: 2;
+  }
+
+  .cards-content {
+    order: 1;
+  }
 }
 
 /* Styles pour le prompt de connexion */
