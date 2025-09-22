@@ -1,6 +1,6 @@
 <template>
   <div class="series">
-    <Navbar />
+    <AppNavbar />
 
     <!-- Header Section -->
     <section class="series-header">
@@ -76,7 +76,7 @@
       </div>
     </main>
 
-    <Footer />
+    <AppFooter />
   </div>
 </template>
 
@@ -84,8 +84,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useSetsStore } from '@/stores/sets';
-import Navbar from '@/components/Navbar.vue';
-import Footer from '@/components/Footer.vue';
+import AppNavbar from '@/components/AppNavbar.vue';
+import AppFooter from '@/components/AppFooter.vue';
 import type { Set as SetType } from '@/types';
 
 const router = useRouter();
@@ -96,7 +96,6 @@ const searchQuery = ref<string>('');
 const expandedSeries = ref<Set<string>>(new Set());
 
 // Utiliser les données du store
-const sets = computed(() => setsStore.sets);
 const loading = computed(() => setsStore.isLoading);
 const error = computed(() => setsStore.error);
 

@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <Navbar />
+    <AppNavbar />
 
     <!-- Hero Section -->
     <section class="hero">
@@ -37,7 +37,7 @@
       </div>
     </main>
 
-    <Footer />
+    <AppFooter />
   </div>
 </template>
 
@@ -45,8 +45,8 @@
 import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useSetsStore } from '@/stores/sets';
-import Navbar from '@/components/Navbar.vue';
-import Footer from '@/components/Footer.vue';
+import AppNavbar from '@/components/AppNavbar.vue';
+import AppFooter from '@/components/AppFooter.vue';
 import type { Set as SetType } from '@/types';
 
 const router = useRouter();
