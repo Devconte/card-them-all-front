@@ -12,14 +12,11 @@ export interface Serie {
 
 export interface Set {
   id: string
+  apiSetId: string
   name: string
   logo?: string | null
   symbol?: string | null
   releaseDate?: string | null
-  cardCount?: {
-    total: number
-    official: number
-  }
   serie?: Serie
 }
 
