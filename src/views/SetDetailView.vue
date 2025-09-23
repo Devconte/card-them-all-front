@@ -124,6 +124,7 @@
       :cards="boosterCards"
       @close="closeBoosterModal"
       @reveal-card="revealCard"
+      @open-another="openBooster"
     />
 
     <AppFooter />
