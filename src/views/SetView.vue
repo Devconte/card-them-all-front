@@ -2,6 +2,11 @@
   <div class="series">
     <AppNavbar />
 
+    <!-- MEGA-EVOLUTION Banner -->
+    <section class="mega-banner">
+      <img src="/bandeaumegaserie.png" alt="MÉGA-ÉVOLUTION" class="banner-image" />
+    </section>
+
     <!-- Header Section -->
     <section class="series-header">
       <div class="header-content">
@@ -246,6 +251,25 @@ onMounted(() => {
 .series {
   background: #f8f9fa;
   padding: 0 40px; /* Padding global pour tout le contenu */
+}
+
+/* MEGA-EVOLUTION Banner */
+.mega-banner {
+  width: 100vw;
+  height: 471px;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  margin-bottom: 2rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
 }
 
 /* Header Section */
@@ -573,6 +597,12 @@ onMounted(() => {
 }
 
 /* Responsive */
+@media (min-width: 1920px) {
+  .mega-banner {
+    height: 600px;
+  }
+}
+
 @media (max-width: 1200px) {
   .header-content,
   .search-section,
@@ -582,6 +612,10 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .mega-banner {
+    height: 350px;
+  }
+
   .series-header {
     padding: 1.5rem 1rem;
   }
