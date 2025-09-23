@@ -32,11 +32,35 @@ export const useSetsStore = defineStore('sets', () => {
       .slice(0, 5);
   });
 
+  // Check if a set has cards with images by fetching the cards
+  const hasCardsWithImages = async (setId: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`http://localhost:3000/cards/sets/${setId}`);
+      if (!response.ok) return false;
+
+      const data = await response.json();
+      const cards = data.data || [];
+
+      // Check if at least one card has an image
+      return cards.some((card: { image: string | null }) => card.image);
+    } catch {
+      return false;
+    }
+  };
+
   // Get sets filtered by search
   const filteredSets = computed(() => {
     return (searchQuery: string) => {
-      if (!searchQuery.trim()) return sets.value;
-      return sets.value.filter((set) => set.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      let filtered = sets.value;
+
+      // Apply search filter
+      if (searchQuery.trim()) {
+        filtered = filtered.filter((set) =>
+          set.name.toLowerCase().includes(searchQuery.toLowerCase()),
+        );
+      }
+
+      return filtered;
     };
   });
 
@@ -57,7 +81,7 @@ export const useSetsStore = defineStore('sets', () => {
       const setsData = apiResponse.data as Set[];
       // Les données sont déjà complètes avec releaseDate et serie
       const setsWithDetails = setsData;
-      // Filter out Pokémon Pocket sets (more robust filtering)
+      // Filter out Pokémon Pocket sets
       const filteredSets = setsWithDetails.filter(
         (set: Set) =>
           !set.apiSetId.includes('tcgp') &&
@@ -74,10 +98,19 @@ export const useSetsStore = defineStore('sets', () => {
             new Date(b.releaseDate!).getTime() - new Date(a.releaseDate!).getTime(),
         );
 
-      sets.value = sortedSets;
+      // Filter out sets without card images (async check)
+      const setsWithCardImages = [];
+      for (const set of sortedSets) {
+        const hasImages = await hasCardsWithImages(set.id);
+        if (hasImages) {
+          setsWithCardImages.push(set);
+        }
+      }
+
+      sets.value = setsWithCardImages;
       lastFetch.value = new Date();
 
-      return sortedSets;
+      return setsWithCardImages;
     } catch (err) {
       error.value = 'Erreur lors du chargement des séries';
       console.error('Erreur:', err);

@@ -46,7 +46,11 @@ export const useCollectionStore = defineStore('collection', () => {
         },
       });
 
-      collection.value = response.data || [];
+      // Filter out cards without images
+      const cardsWithImages = (response.data || []).filter(
+        (userCard: UserCard) => userCard.card.image,
+      );
+      collection.value = cardsWithImages;
     } catch (err: unknown) {
       console.error('❌ Error fetching collection:', err);
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement';

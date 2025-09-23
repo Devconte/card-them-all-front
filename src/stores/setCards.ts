@@ -52,17 +52,20 @@ export const useSetCardsStore = defineStore('setCards', () => {
 
       const data = (await response.json()) as { data: Card[] };
 
+      // Filter out cards without images
+      const cardsWithImages = (data.data || []).filter((card: Card) => card.image);
+
       // Extraire les rarités uniques
       const uniqueRarities = [
         ...new Set(
-          data.data
+          cardsWithImages
             ?.map((card: Card) => card.rarity?.name)
             .filter((name): name is string => Boolean(name)) || [],
         ),
       ];
 
       state.value[setId] = {
-        cards: data.data || [],
+        cards: cardsWithImages,
         rarities: uniqueRarities,
         loading: false,
         error: null,
