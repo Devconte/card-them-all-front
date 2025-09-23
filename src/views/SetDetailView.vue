@@ -55,11 +55,19 @@
             </div>
 
             <!-- Open Booster Button -->
-            <div v-if="authStore.isAuthenticated" class="filter-section">
-              <button @click="openBooster" class="booster-btn">
-                <img src="/pokeball.png" alt="Pokéball" class="booster-icon" />
+            <div class="filter-section">
+              <button
+                @click="openBooster"
+                class="booster-btn"
+                :class="{ 'booster-btn-disabled': !authStore.isAuthenticated }"
+              >
+                <img src="/pokeball.png" alt="Pokéball" class="pokeball-icon" />
                 Ouvrir un Booster
               </button>
+              <p v-if="!authStore.isAuthenticated" class="booster-info">
+                <span class="info-icon">ℹ️</span>
+                Connectez-vous pour ouvrir des boosters !
+              </p>
             </div>
           </div>
         </aside>
@@ -412,6 +420,36 @@ onMounted(() => {
 .pokeball-icon {
   width: 32px;
   height: 32px;
+}
+
+/* Booster Button States */
+.booster-btn-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #ccc !important;
+  color: #666 !important;
+}
+
+.booster-btn-disabled:hover {
+  background: #ccc !important;
+  transform: none !important;
+}
+
+.booster-info {
+  margin-top: 0.8rem;
+  padding: 0.8rem;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 14px;
+  color: #856404;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.info-icon {
+  margin-right: 0.5rem;
 }
 
 .header-actions {
