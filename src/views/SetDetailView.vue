@@ -55,15 +55,10 @@
             </div>
 
             <!-- Open Booster Button -->
-            <div class="booster-section">
-              <button
-                class="booster-btn"
-                @click="openBooster"
-                :disabled="!authStore.isLoggedIn"
-                :title="!authStore.isLoggedIn ? 'Veuillez vous connecter' : ''"
-              >
-                <span class="booster-icon">+</span>
-                J'ouvre un booster
+            <div v-if="authStore.isAuthenticated" class="filter-section">
+              <button @click="openBooster" class="booster-btn">
+                <img src="/pokeball.png" alt="Pokéball" class="booster-icon" />
+                Ouvrir un Booster
               </button>
             </div>
           </div>
@@ -123,6 +118,14 @@
       </div>
     </main>
 
+    <!-- Booster Modal -->
+    <BoosterModal
+      :is-open="isBoosterModalOpen"
+      :cards="boosterCards"
+      @close="closeBoosterModal"
+      @reveal-card="revealCard"
+    />
+
     <AppFooter />
   </div>
 </template>
@@ -136,6 +139,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useCollectionStore } from '@/stores/collection';
 import AppNavbar from '@/components/AppNavbar.vue';
 import AppFooter from '@/components/AppFooter.vue';
+import BoosterModal from '@/components/BoosterModal.vue';
 import type { Set as SetType, Card } from '@/types';
 
 const route = useRoute();
@@ -149,6 +153,10 @@ const loading = ref<boolean>(false);
 const set = ref<SetType | null>(null);
 const searchQuery = ref<string>('');
 const selectedRarities = ref<string[]>([]);
+
+// Booster Modal State
+const isBoosterModalOpen = ref(false);
+const boosterCards = ref<Card[]>([]);
 
 // Computed from store
 const cards = computed(() => setCardsStore.getSetCards(route.params.id as string));
@@ -248,13 +256,81 @@ const selectCard = (card: Card) => {
   console.log('Card selected:', card);
 };
 
-const openBooster = () => {
-  if (!authStore.isLoggedIn) {
+const openBooster = async () => {
+  if (!authStore.isAuthenticated) {
     router.push('/login');
     return;
   }
-  // TODO: Implement booster opening logic
-  console.log('Opening booster for set:', set.value?.id);
+
+  try {
+    console.log('Opening booster for set:', set.value?.id);
+    console.log('Auth token:', authStore.accessToken ? 'Present' : 'Missing');
+
+    // Call backend API to open booster
+    const response = await fetch(`http://localhost:3000/cards/booster-pack/open`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authStore.accessToken}`,
+      },
+      body: JSON.stringify({
+        setId: set.value?.id,
+      }),
+    });
+
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API Error:', errorText);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('Booster data received:', data);
+
+    // Check different possible response structures
+    const boosterCardsData = data.cards || data.data?.cards || data.data || [];
+    console.log('Cards count:', boosterCardsData.length);
+    console.log('Cards data:', boosterCardsData);
+
+    // Extract card objects from the response structure
+    const cards = boosterCardsData.map((item: any) => {
+      const card = item.card || item;
+      // Fix rarity structure if it's a string
+      if (typeof card.rarity === 'string') {
+        card.rarity = { name: card.rarity };
+      }
+      return card;
+    });
+    console.log('Extracted cards:', cards);
+
+    // Prepare cards for modal with optimized images
+    const cardsWithImages = cards.map((card: Card) => ({
+      ...card,
+      image: getCardImage(card),
+      revealed: false,
+    }));
+
+    boosterCards.value = cardsWithImages;
+    isBoosterModalOpen.value = true;
+  } catch (error) {
+    console.error('Error opening booster:', error);
+    alert(`Erreur lors de l'ouverture du booster: ${error.message}`);
+  }
+};
+
+const closeBoosterModal = () => {
+  isBoosterModalOpen.value = false;
+  boosterCards.value = [];
+  fetchCollection();
+};
+
+const revealCard = (index: number) => {
+  if (boosterCards.value[index]) {
+    boosterCards.value[index].revealed = true;
+  }
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -341,6 +417,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .card-count {
@@ -368,6 +445,38 @@ onMounted(() => {
 
 .total-count {
   color: rgba(255, 255, 255, 0.8);
+}
+
+.booster-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #ff6b35, #ff8e53);
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  width: 100%;
+  justify-content: center;
+}
+
+.booster-btn:hover {
+  background: linear-gradient(135deg, #e55a2b, #e67e47);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.booster-icon {
+  width: 18px;
+  height: 18px;
 }
 
 /* Main Content */
