@@ -28,9 +28,6 @@
             <img src="/pokeball.png" alt="Pokéball" class="pokeball-icon" />
             <h1>Ma Collection</h1>
           </div>
-          <div class="collection-stats">
-            <span class="total-cards">{{ filteredCollection.length }} cartes</span>
-          </div>
         </div>
 
         <div class="content-layout">
@@ -83,6 +80,26 @@
 
           <!-- Cards Content -->
           <div class="cards-content">
+            <!-- Quick Stats Bar -->
+            <div class="quick-stats-bar">
+              <div class="stat-chip">
+                <span class="stat-value">{{ stats.totalCards }}</span>
+                <span class="stat-label">Total</span>
+              </div>
+              <div class="stat-chip">
+                <span class="stat-value">{{ stats.uniqueCards }}</span>
+                <span class="stat-label">Uniques</span>
+              </div>
+              <div class="stat-chip">
+                <span class="stat-value">{{ stats.totalSets }}</span>
+                <span class="stat-label">Séries</span>
+              </div>
+              <div class="stat-chip favorite">
+                <span class="stat-value">{{ stats.topSeries }}</span>
+                <span class="stat-label">Favorite</span>
+              </div>
+            </div>
+
             <!-- Loading state -->
             <div v-if="loading" class="loading">
               <div class="loading-spinner"></div>
@@ -116,9 +133,6 @@
                     class="card-image"
                     @error="handleImageError"
                   />
-                  <div v-if="userCard.quantity > 1" class="quantity-badge">
-                    {{ userCard.quantity }}
-                  </div>
                 </div>
                 <div class="card-info">
                   <div class="card-name-row">
@@ -225,10 +239,53 @@ const filteredCollection = computed(() => {
   return filtered;
 });
 
+// Collection stats from API
+const stats = ref({
+  totalCards: 0,
+  uniqueCards: 0,
+  totalSets: 0,
+  topSeries: '',
+});
+
+const fetchStats = async () => {
+  if (!authStore.isAuthenticated) return;
+
+  try {
+    const response = await fetch('http://localhost:3000/collections/stats', {
+      headers: {
+        Authorization: `Bearer ${authStore.accessToken}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      // Trouver la série avec le plus de cartes
+      let topSeries = 'Aucune';
+      if (data.cardsBySet && data.cardsBySet.length > 0) {
+        const sortedSets = data.cardsBySet.sort(
+          (a: { cardCount: number }, b: { cardCount: number }) => b.cardCount - a.cardCount,
+        );
+        topSeries = sortedSets[0].setName;
+      }
+
+      stats.value = {
+        totalCards: data.totalCards || 0,
+        uniqueCards: data.uniqueCards || 0,
+        totalSets: data.totalSets || 0,
+        topSeries,
+      };
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des stats:', error);
+  }
+};
+
 // Charger les données au montage
 onMounted(() => {
   if (authStore.isAuthenticated) {
     fetchCollection();
+    fetchStats();
   }
 });
 
@@ -238,6 +295,7 @@ watch(
   (isAuth) => {
     if (isAuth) {
       fetchCollection();
+      fetchStats();
     }
   },
   { immediate: true },
@@ -380,24 +438,6 @@ const handleImageError = (event: Event) => {
   position: relative;
 }
 
-.quantity-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: #facf19;
-  color: #2b499b;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  border: 2px solid #2b499b;
-}
-
 .card-image {
   max-width: 100%;
   height: auto;
@@ -516,6 +556,60 @@ const handleImageError = (event: Event) => {
   font-size: 17px;
 }
 
+/* Quick Stats Bar */
+.quick-stats-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.stat-chip {
+  background: white;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 70px;
+  transition: transform 0.2s ease;
+}
+
+.stat-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-chip .stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2b499b;
+  font-family: 'Montserrat Alternates', sans-serif;
+  line-height: 1;
+}
+
+.stat-chip .stat-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.25rem;
+}
+
+.stat-chip.favorite {
+  min-width: 120px;
+}
+
+.stat-chip.favorite .stat-value {
+  font-size: 1rem;
+  text-align: center;
+  word-break: break-word;
+  line-height: 1.1;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .content-layout {
@@ -529,6 +623,153 @@ const handleImageError = (event: Event) => {
 
   .cards-content {
     order: 1;
+  }
+
+  .quick-stats-bar {
+    gap: 0.5rem;
+  }
+
+  .stat-chip {
+    padding: 0.4rem 0.8rem;
+    min-width: 60px;
+  }
+
+  .stat-chip .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .stat-chip .stat-label {
+    font-size: 0.7rem;
+  }
+
+  .stat-chip.favorite {
+    min-width: 100px;
+  }
+
+  .stat-chip.favorite .stat-value {
+    font-size: 0.9rem;
+  }
+}
+
+/* Statistics Dashboard */
+.stats-dashboard {
+  margin: 2rem 0;
+  padding: 0 2rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #facf19, #2b499b);
+}
+
+.stat-card.primary::before {
+  background: linear-gradient(90deg, #2b499b, #4169e1);
+}
+
+.stat-card.rare::before {
+  background: linear-gradient(90deg, #ff6b6b, #ffd93d);
+}
+
+.stat-card.series::before {
+  background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+}
+
+.stat-card.completion::before {
+  background: linear-gradient(90deg, #00b894, #00cec9);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card .stat-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 1rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2b499b;
+}
+
+.stat-card .stat-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.stat-content {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2b499b;
+  font-family: 'Montserrat Alternates', sans-serif;
+  margin-bottom: 0.5rem;
+  word-break: break-word;
+  line-height: 1.1;
+}
+
+/* Adjust text size for long series names */
+.stat-card.completion .stat-value {
+  font-size: 1.8rem;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 1rem;
+  color: #6c757d;
+  font-weight: 500;
+  font-family: 'Montserrat Alternates', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1.5rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 }
 
