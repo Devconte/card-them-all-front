@@ -74,42 +74,42 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
-const router = useRouter()
-const authStore = useAuthStore()
+const router = useRouter();
+const authStore = useAuthStore();
 
 // Form data
-const email = ref('')
-const password = ref('')
+const email = ref('');
+const password = ref('');
 
 const handleLogin = async () => {
-  console.log('🔍 handleLogin called with:', { email: email.value, password: password.value })
+  console.log('🔍 handleLogin called with:', { email: email.value, password: password.value });
 
-  authStore.clearError()
+  authStore.clearError();
 
-  console.log('📞 Calling authStore.login...')
-  const success = await authStore.login(email.value, password.value)
-  console.log('📞 authStore.login result:', success)
+  console.log('📞 Calling authStore.login...');
+  const success = await authStore.login(email.value, password.value);
+  console.log('📞 authStore.login result:', success);
 
   if (success) {
-    console.log('✅ Login successful, redirecting to home')
+    console.log('✅ Login successful, redirecting to home');
 
     // Vérifier le token après connexion
-    console.log('🔍 Vérification du token après connexion:')
-    console.log('📦 Token in sessionStorage:', sessionStorage.getItem('access_token'))
-    console.log('📦 Refresh token in sessionStorage:', sessionStorage.getItem('refresh_token'))
-    console.log('📦 User in sessionStorage:', sessionStorage.getItem('user'))
-    console.log('👤 AuthStore user:', authStore.user)
-    console.log('🔐 AuthStore isLoggedIn:', authStore.isAuthenticated)
+    console.log('🔍 Vérification du token après connexion:');
+    console.log('📦 Token in sessionStorage:', sessionStorage.getItem('access_token'));
+    console.log('📦 Refresh token in sessionStorage:', sessionStorage.getItem('refresh_token'));
+    console.log('📦 User in sessionStorage:', sessionStorage.getItem('user'));
+    console.log('👤 AuthStore user:', authStore.user);
+    console.log('🔐 AuthStore isLoggedIn:', authStore.isAuthenticated);
 
-    router.push('/')
+    router.push('/');
   } else {
-    console.log('❌ Login failed')
+    console.log('❌ Login failed');
   }
-}
+};
 </script>
 
 <style scoped>

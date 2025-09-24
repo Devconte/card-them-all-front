@@ -111,22 +111,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
-const router = useRouter()
-const authStore = useAuthStore()
+const router = useRouter();
+const authStore = useAuthStore();
 
 // Form data
-const username = ref('')
-const email = ref('')
-const password = ref('')
-const confirmPassword = ref('')
+const username = ref('');
+const email = ref('');
+const password = ref('');
+const confirmPassword = ref('');
 
 const passwordMismatch = computed(() => {
-  return password.value && confirmPassword.value && password.value !== confirmPassword.value
-})
+  return password.value && confirmPassword.value && password.value !== confirmPassword.value;
+});
 
 const isFormValid = computed(() => {
   return (
@@ -135,18 +135,18 @@ const isFormValid = computed(() => {
     password.value &&
     confirmPassword.value &&
     !passwordMismatch.value
-  )
-})
+  );
+});
 
 const handleRegister = async () => {
-  authStore.clearError()
+  authStore.clearError();
 
   if (passwordMismatch.value) {
-    return
+    return;
   }
 
   if (!username.value || !email.value || !password.value || !confirmPassword.value) {
-    return
+    return;
   }
 
   const success = await authStore.register(
@@ -154,12 +154,12 @@ const handleRegister = async () => {
     password.value,
     username.value,
     confirmPassword.value,
-  )
+  );
 
   if (success) {
-    router.push('/')
+    router.push('/');
   }
-}
+};
 </script>
 
 <style scoped>
