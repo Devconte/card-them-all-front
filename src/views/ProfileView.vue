@@ -342,14 +342,13 @@ const updateProfile = async () => {
       showMessage(error.message || 'Erreur lors de la mise à jour', 'error');
     }
   } catch (error) {
-    showMessage('Erreur de connexion', 'error');
+    showMessage('Erreur de connexion', error as 'error');
   } finally {
     isUpdating.value = false;
   }
 };
 
 const changePassword = async () => {
-  console.log('🔑 changePassword appelé !');
   if (!authStore.user?.id) return;
 
   isChangingPassword.value = true;
@@ -374,7 +373,7 @@ const changePassword = async () => {
       showMessage(error.message || 'Erreur lors du changement de mot de passe', 'error');
     }
   } catch (error) {
-    showMessage('Erreur de connexion', 'error');
+    showMessage('Erreur de connexion', error as 'error');
   } finally {
     isChangingPassword.value = false;
   }
@@ -428,7 +427,7 @@ const deleteAccount = async () => {
       showMessage(error.message || 'Erreur lors de la suppression', 'error');
     }
   } catch (error) {
-    showMessage('Erreur de connexion', 'error');
+    showMessage('Erreur de connexion', error as 'error');
   } finally {
     isDeleting.value = false;
     showDeleteModal.value = false;
