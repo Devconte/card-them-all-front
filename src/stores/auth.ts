@@ -15,7 +15,7 @@ declare module 'axios' {
 export interface User {
   id: string;
   email: string;
-  name: string; // Le backend retourne 'name' mais utilise 'username' en interne
+  username: string;
 }
 
 export interface AuthError {

@@ -262,7 +262,6 @@ const fetchSetDetails = async () => {
 
 const selectCard = (card: Card) => {
   // TODO: Show card details modal
-  console.log('Card selected:', card);
 };
 
 const openBooster = async () => {
@@ -272,8 +271,7 @@ const openBooster = async () => {
   }
 
   try {
-    console.log('Opening booster for set:', set.value?.id);
-    console.log('Auth token:', authStore.accessToken ? 'Present' : 'Missing');
+    // Opening booster for set
 
     // Call backend API to open booster
     const response = await fetch(`http://localhost:3000/cards/booster-pack/open`, {
@@ -287,22 +285,15 @@ const openBooster = async () => {
       }),
     });
 
-    console.log('Response status:', response.status);
-    console.log('Response ok:', response.ok);
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('API Error:', errorText);
       throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('Booster data received:', data);
 
     // Check different possible response structures
     const boosterCardsData = data.cards || data.data?.cards || data.data || [];
-    console.log('Cards count:', boosterCardsData.length);
-    console.log('Cards data:', boosterCardsData);
 
     // Extract card objects from the response structure
     const cards = boosterCardsData.map((item: any) => {
@@ -313,7 +304,7 @@ const openBooster = async () => {
       }
       return card;
     });
-    console.log('Extracted cards:', cards);
+    // Cards extracted successfully
 
     // Prepare cards for modal with optimized images
     const cardsWithImages = cards.map((card: Card) => ({
@@ -325,7 +316,6 @@ const openBooster = async () => {
     boosterCards.value = cardsWithImages;
     isBoosterModalOpen.value = true;
   } catch (error) {
-    console.error('Error opening booster:', error);
     alert(`Erreur lors de l'ouverture du booster: ${error.message}`);
   }
 };

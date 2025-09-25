@@ -288,7 +288,7 @@ onMounted(() => {
 /* Responsive Design */
 @media (min-width: 1200px) {
   .hero {
-    height: 100vh;
+    height: 60vh;
     overflow: hidden;
   }
 

@@ -86,28 +86,12 @@ const email = ref('');
 const password = ref('');
 
 const handleLogin = async () => {
-  console.log('🔍 handleLogin called with:', { email: email.value, password: password.value });
-
   authStore.clearError();
 
-  console.log('📞 Calling authStore.login...');
   const success = await authStore.login(email.value, password.value);
-  console.log('📞 authStore.login result:', success);
 
   if (success) {
-    console.log('✅ Login successful, redirecting to home');
-
-    // Vérifier le token après connexion
-    console.log('🔍 Vérification du token après connexion:');
-    console.log('📦 Token in sessionStorage:', sessionStorage.getItem('access_token'));
-    console.log('📦 Refresh token in sessionStorage:', sessionStorage.getItem('refresh_token'));
-    console.log('📦 User in sessionStorage:', sessionStorage.getItem('user'));
-    console.log('👤 AuthStore user:', authStore.user);
-    console.log('🔐 AuthStore isLoggedIn:', authStore.isAuthenticated);
-
     router.push('/');
-  } else {
-    console.log('❌ Login failed');
   }
 };
 </script>

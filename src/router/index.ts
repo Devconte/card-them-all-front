@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue';
 import SetView from '../views/SetView.vue';
 import SetDetailView from '../views/SetDetailView.vue';
 import CollectionView from '../views/CollectionView.vue';
+import ProfileView from '../views/ProfileView.vue';
 import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
 
@@ -35,6 +36,11 @@ const router = createRouter({
       path: '/collection',
       name: 'collection',
       component: CollectionView,
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: ProfileView,
     },
     {
       path: '/login',

@@ -14,7 +14,8 @@
 
       <!-- Si connecté -->
       <div v-if="authStore.isAuthenticated" class="user-menu">
-        <span class="user-name">{{ authStore.user?.name }}</span>
+        <span class="user-name">{{ authStore.user?.username }}</span>
+        <router-link to="/profile" class="profile-link">Profil</router-link>
         <button @click="authStore.logout" class="logout-btn">Déconnexion</button>
       </div>
 
@@ -160,6 +161,21 @@ const authStore = useAuthStore();
   color: #2b499b;
   font-weight: 600;
   font-size: 17px;
+}
+
+.profile-link {
+  color: #2b499b;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  border: 2px solid #2b499b;
+}
+
+.profile-link:hover {
+  background: #2b499b;
+  color: white;
 }
 
 .logout-btn {
