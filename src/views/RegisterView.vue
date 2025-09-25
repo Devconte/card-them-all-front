@@ -138,8 +138,34 @@ const isFormValid = computed(() => {
   );
 });
 
+const validatePassword = (password: string): string | null => {
+  if (password.length < 8) {
+    return 'Le mot de passe doit contenir au moins 8 caractères';
+  }
+  if (!/(?=.*[a-z])/.test(password)) {
+    return 'Le mot de passe doit contenir au moins une minuscule';
+  }
+  if (!/(?=.*[A-Z])/.test(password)) {
+    return 'Le mot de passe doit contenir au moins une majuscule';
+  }
+  if (!/(?=.*\d)/.test(password)) {
+    return 'Le mot de passe doit contenir au moins un chiffre';
+  }
+  if (!/(?=.*[@$!%*?&])/.test(password)) {
+    return 'Le mot de passe doit contenir au moins un caractère spécial (@$!%*?&)';
+  }
+  return null;
+};
+
 const handleRegister = async () => {
   authStore.clearError();
+
+  // Validation du mot de passe
+  const passwordError = validatePassword(password.value);
+  if (passwordError) {
+    authStore.error = { message: passwordError };
+    return;
+  }
 
   if (passwordMismatch.value) {
     return;
