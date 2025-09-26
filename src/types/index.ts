@@ -59,6 +59,7 @@ export interface Card {
   };
   createdAt: string;
   updatedAt: string;
+  revealed?: boolean;
 }
 
 // Types pour l'API

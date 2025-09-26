@@ -316,7 +316,7 @@ const openBooster = async () => {
     boosterCards.value = cardsWithImages;
     isBoosterModalOpen.value = true;
   } catch (error) {
-    alert(`Erreur lors de l'ouverture du booster: ${error.message}`);
+    alert(`Erreur lors de l'ouverture du booster: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
   }
 };
 
@@ -330,12 +330,6 @@ const revealCard = (index: number) => {
   if (boosterCards.value[index]) {
     boosterCards.value[index].revealed = true;
   }
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const isCardOwned = (_cardId: string): boolean => {
-  // For now, all cards are considered owned until collection integration
-  return true;
 };
 
 const getCardImage = (card: Card): string => {

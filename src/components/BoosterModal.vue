@@ -50,16 +50,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import type { Card } from '@/types';
 
-interface Card {
-  id: string;
-  name: string;
-  image: string;
-  rarity?: {
-    name: string;
-  };
-  revealed?: boolean;
-}
 
 interface Props {
   isOpen: boolean;
