@@ -49,17 +49,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-
-interface Card {
-  id: string;
-  name: string;
-  image: string;
-  rarity?: {
-    name: string;
-  };
-  revealed?: boolean;
-}
+import { ref } from 'vue';
+import type { Card } from '@/types';
 
 interface Props {
   isOpen: boolean;
