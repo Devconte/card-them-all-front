@@ -296,7 +296,7 @@ const openBooster = async () => {
     const boosterCardsData = data.cards || data.data?.cards || data.data || [];
 
     // Extract card objects from the response structure
-    const cards = boosterCardsData.map((item: any) => {
+    const cards = boosterCardsData.map((item: card) => {
       const card = item.card || item;
       // Fix rarity structure if it's a string
       if (typeof card.rarity === 'string') {
@@ -316,7 +316,9 @@ const openBooster = async () => {
     boosterCards.value = cardsWithImages;
     isBoosterModalOpen.value = true;
   } catch (error) {
-    alert(`Erreur lors de l'ouverture du booster: ${error.message}`);
+    alert(
+      `Erreur lors de l'ouverture du booster: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+    );
   }
 };
 
@@ -330,12 +332,6 @@ const revealCard = (index: number) => {
   if (boosterCards.value[index]) {
     boosterCards.value[index].revealed = true;
   }
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const isCardOwned = (_cardId: string): boolean => {
-  // For now, all cards are considered owned until collection integration
-  return true;
 };
 
 const getCardImage = (card: Card): string => {
