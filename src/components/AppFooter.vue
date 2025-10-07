@@ -12,10 +12,14 @@
         </div>
       </div>
 
-      <!-- Center Section - Copyright -->
+      <!-- Center Section - Copyright and Legal -->
       <div class="footer-center">
-        <p class="footer-copyright">
-          @2025 CardThemAll &nbsp;&nbsp; Terms &nbsp;&nbsp; Privacy &nbsp;&nbsp; Cookies
+        <p class="footer-copyright">@2025 CardThemAll</p>
+        <p class="footer-disclaimer">
+          Les informations présentées sur ce site concernant le Jeu de Cartes à Collectionner
+          Pokémon, y compris les images et les textes, sont la propriété intellectuelle de The
+          Pokémon Company, Nintendo, Game Freak, Creatures et/ou Wizards of the Coast. Card them all
+          n'est ni produit, ni approuvé, ni soutenu, ni affilié à aucune de ces sociétés.
         </p>
       </div>
 
@@ -119,12 +123,24 @@
 .footer-copyright {
   color: #e8e8e8;
   font-size: 15px;
-  margin: 0;
+  margin: 0 0 1rem 0;
   text-align: center;
   font-family: 'Montserrat Alternates', sans-serif;
   letter-spacing: 0.5px;
   line-height: 1.4;
   word-spacing: 0.3em;
+}
+
+.footer-disclaimer {
+  color: #c0c0c0;
+  font-size: 14px;
+  margin: 0;
+  text-align: center;
+  font-family: 'Montserrat Alternates', sans-serif;
+  line-height: 1.6;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .footer-right {
@@ -208,6 +224,12 @@
   .footer-social {
     justify-content: center;
   }
+
+  .footer-disclaimer {
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 0 0.5rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -222,6 +244,12 @@
   .footer-nav {
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .footer-disclaimer {
+    font-size: 12px;
+    line-height: 1.4;
+    padding: 0 0.25rem;
   }
 }
 </style>
