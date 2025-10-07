@@ -135,6 +135,15 @@
       @open-another="openBooster"
     />
 
+    <!-- Card Details Modal -->
+    <CardDetails
+      v-if="selectedCard"
+      :card="selectedCard"
+      :is-open="isCardDetailsOpen"
+      :total-cards-in-set="cards.length"
+      @close="closeCardDetailsModal"
+    />
+
     <AppFooter />
   </div>
 </template>
@@ -149,6 +158,7 @@ import { useCollectionStore } from '@/stores/collection';
 import AppNavbar from '@/components/AppNavbar.vue';
 import AppFooter from '@/components/AppFooter.vue';
 import BoosterModal from '@/components/BoosterModal.vue';
+import CardDetails from '@/components/CardDetails.vue';
 import type { Set as SetType, Card } from '@/types';
 
 const route = useRoute();
@@ -166,6 +176,10 @@ const selectedRarities = ref<string[]>([]);
 // Booster Modal State
 const isBoosterModalOpen = ref(false);
 const boosterCards = ref<Card[]>([]);
+
+// Card Details Modal State
+const isCardDetailsOpen = ref(false);
+const selectedCard = ref<Card | null>(null);
 
 // Computed from store
 const cards = computed(() => setCardsStore.getSetCards(route.params.id as string));
@@ -261,7 +275,8 @@ const fetchSetDetails = async () => {
 };
 
 const selectCard = (card: Card) => {
-  // TODO: Show card details modal
+  selectedCard.value = card;
+  isCardDetailsOpen.value = true;
 };
 
 const openBooster = async () => {
@@ -326,6 +341,11 @@ const closeBoosterModal = () => {
   isBoosterModalOpen.value = false;
   boosterCards.value = [];
   fetchCollection();
+};
+
+const closeCardDetailsModal = () => {
+  isCardDetailsOpen.value = false;
+  selectedCard.value = null;
 };
 
 const revealCard = (index: number) => {
