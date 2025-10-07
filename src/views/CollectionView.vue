@@ -125,7 +125,12 @@
 
             <!-- Collection content -->
             <div v-else class="cards-grid">
-              <div v-for="userCard in filteredCollection" :key="userCard.id" class="card-item">
+              <div
+                v-for="userCard in filteredCollection"
+                :key="userCard.id"
+                class="card-item"
+                @click="openCardDetails(userCard)"
+              >
                 <div class="card-image-container">
                   <img
                     :src="getCardImage(userCard)"
@@ -148,6 +153,14 @@
     </main>
 
     <AppFooter />
+
+    <!-- Modal de détail de carte -->
+    <CardDetails
+      v-if="selectedCard"
+      :card="selectedCard"
+      :isOpen="isCardDetailsOpen"
+      @close="closeCardDetails"
+    />
   </div>
 </template>
 
@@ -158,6 +171,9 @@ import { useCollectionStore } from '@/stores/collection';
 import { useAuthStore } from '@/stores/auth';
 import AppNavbar from '@/components/AppNavbar.vue';
 import AppFooter from '@/components/AppFooter.vue';
+import CardDetails from '@/components/CardDetails.vue';
+import type { Card } from '@/types';
+
 // Types pour la collection
 interface UserCard {
   id: string;
@@ -314,6 +330,20 @@ const getCardImage = (userCard: UserCard): string => {
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement;
   img.src = '/logocard.png';
+};
+
+// Modal de détail de carte
+const isCardDetailsOpen = ref(false);
+const selectedCard = ref<Card | null>(null);
+
+const openCardDetails = (userCard: UserCard) => {
+  selectedCard.value = userCard.card as Card;
+  isCardDetailsOpen.value = true;
+};
+
+const closeCardDetails = () => {
+  isCardDetailsOpen.value = false;
+  selectedCard.value = null;
 };
 </script>
 
