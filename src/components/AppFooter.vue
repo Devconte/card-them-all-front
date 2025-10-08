@@ -4,7 +4,12 @@
       <!-- Left Section - Logo and Navigation -->
       <div class="footer-left">
         <div class="footer-logo">
-          <img src="/logocardlong.png" alt="Card Them All" class="footer-logo-img" />
+          <img
+            src="/logocardlong.png"
+            alt="Card Them All"
+            class="footer-logo-img footer-logo-desktop"
+          />
+          <img src="/logocard.png" alt="Card Them All" class="footer-logo-img footer-logo-mobile" />
         </div>
         <div class="footer-nav">
           <router-link to="/sets" class="footer-link">Sets</router-link>
@@ -21,6 +26,22 @@
           Pokémon Company, Nintendo, Game Freak, Creatures et/ou Wizards of the Coast. Card them all
           n'est ni produit, ni approuvé, ni soutenu, ni affilié à aucune de ces sociétés.
         </p>
+
+        <!-- Layout mobile pour le bas -->
+        <div class="footer-bottom-mobile">
+          <p class="footer-copyright-mobile">@2025 CardThemAll</p>
+          <div class="footer-social-mobile">
+            <a href="#" class="social-link facebook">
+              <span class="social-icon">f</span>
+            </a>
+            <a href="#" class="social-link instagram">
+              <span class="social-icon">📷</span>
+            </a>
+            <a href="#" class="social-link twitter">
+              <span class="social-icon">X</span>
+            </a>
+          </div>
+        </div>
       </div>
 
       <!-- Right Section - Social Media -->
@@ -52,6 +73,21 @@
   padding: 2rem 0 3.5rem 0;
   margin-top: 4rem;
   border-radius: 20px 20px 0 0;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  width: 100vw;
+}
+
+/* Desktop: garde les coins arrondis */
+@media (min-width: 769px) {
+  .app-footer {
+    border-radius: 20px 20px 0 0;
+  }
+
+  /* Cacher les éléments mobile sur desktop */
+  .footer-bottom-mobile {
+    display: none;
+  }
 }
 
 .footer-content {
@@ -79,8 +115,19 @@
 }
 
 .footer-logo-img {
+  transition: transform 0.3s ease;
+}
+
+.footer-logo-desktop {
   height: 80px;
   width: auto;
+}
+
+.footer-logo-mobile {
+  height: 80px;
+  width: 80px;
+  display: none;
+  object-fit: contain;
 }
 
 .footer-brand {
@@ -199,36 +246,113 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .app-footer {
+    padding: 2rem 0;
+    border-radius: 0;
+  }
+
   .footer-content {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
     text-align: center;
-    min-height: 200px;
+    min-height: auto;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .footer-left {
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .footer-logo-desktop {
+    display: none;
+  }
+
+  .footer-logo-mobile {
+    display: block;
+    height: 86px;
+    width: 74px;
+  }
+
+  .footer-nav {
+    justify-content: center;
+    gap: 2rem;
   }
 
   .footer-center {
     position: static;
     transform: none;
-    margin-top: 2rem;
+    order: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
   }
 
   .footer-right {
     align-items: center;
     justify-self: center;
+    order: 2;
+    gap: 1.5rem;
   }
 
-  .footer-nav {
-    justify-content: center;
+  /* Layout mobile spécifique pour le bas */
+  .footer-bottom-mobile {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .footer-copyright-mobile {
+    color: #e8e8e8;
+    font-size: 12px;
+    margin: 0;
+    font-family: 'Montserrat Alternates', sans-serif;
+  }
+
+  .footer-social-mobile {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  /* Cacher les éléments desktop sur mobile */
+  .footer-copyright {
+    display: none;
+  }
+
+  .footer-right {
+    display: none;
+  }
+
+  .footer-social-title {
+    font-size: 16px;
+    margin-bottom: 0.5rem;
   }
 
   .footer-social {
     justify-content: center;
+    gap: 1rem;
+  }
+
+  .social-link {
+    width: 45px;
+    height: 45px;
+  }
+
+  .footer-copyright {
+    font-size: 14px;
+    margin: 0 0 0.5rem 0;
   }
 
   .footer-disclaimer {
-    font-size: 13px;
-    line-height: 1.5;
-    padding: 0 0.5rem;
+    font-size: 12px;
+    line-height: 1.4;
+    padding: 0;
+    margin: 0;
   }
 }
 
@@ -239,17 +363,31 @@
 
   .footer-content {
     padding: 0 1rem;
+    max-width: 320px;
+  }
+
+  .footer-logo-mobile {
+    height: 60px;
+    width: 60px;
   }
 
   .footer-nav {
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+
+  .footer-social {
+    gap: 0.8rem;
+  }
+
+  .social-link {
+    width: 40px;
+    height: 40px;
   }
 
   .footer-disclaimer {
-    font-size: 12px;
-    line-height: 1.4;
-    padding: 0 0.25rem;
+    font-size: 11px;
+    line-height: 1.3;
   }
 }
 </style>
