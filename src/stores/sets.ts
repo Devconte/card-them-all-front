@@ -29,7 +29,7 @@ export const useSetsStore = defineStore('sets', () => {
     return sets.value
       .filter((set) => set.releaseDate)
       .sort((a, b) => new Date(b.releaseDate!).getTime() - new Date(a.releaseDate!).getTime())
-      .slice(0, 5);
+      .slice(0, 7);
   });
 
   // Check if a set has cards with images by fetching the cards
