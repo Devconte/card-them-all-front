@@ -383,13 +383,13 @@ const openBooster = async () => {
     const boosterCardsData = data.cards || data.data?.cards || data.data || [];
 
     // Extract card objects from the response structure
-    const cards = boosterCardsData.map((item: card) => {
-      const card = item.card || item;
+    const cards = boosterCardsData.map((item: Card | { card: Card }) => {
+      const cardData = 'card' in item ? item.card : item;
       // Fix rarity structure if it's a string
-      if (typeof card.rarity === 'string') {
-        card.rarity = { name: card.rarity };
+      if (typeof cardData.rarity === 'string') {
+        cardData.rarity = { id: '', name: cardData.rarity };
       }
-      return card;
+      return cardData;
     });
     // Cards extracted successfully
 
@@ -1172,10 +1172,33 @@ onMounted(() => {
     order: 1;
   }
 
+  .detail-header {
+    padding: 1.5rem 1rem;
+  }
+
   .header-content {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .pokeball-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 0.5rem;
+  }
+
+  .card-count,
+  .card-counter {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .main-content {
@@ -1213,6 +1236,25 @@ onMounted(() => {
 
 /* Mobile portrait (480px to 361px) - 2 columns */
 @media (max-width: 480px) and (min-width: 361px) {
+  .detail-header {
+    padding: 1rem 0.75rem;
+  }
+
+  .page-title {
+    font-size: 1.3rem;
+  }
+
+  .pokeball-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .card-count,
+  .card-counter {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
+
   .cards-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.7rem;
@@ -1221,6 +1263,25 @@ onMounted(() => {
 
 /* Very small mobile screens (360px and below) - 2 columns */
 @media (max-width: 360px) {
+  .detail-header {
+    padding: 0.8rem 0.5rem;
+  }
+
+  .page-title {
+    font-size: 1.2rem;
+  }
+
+  .pokeball-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .card-count,
+  .card-counter {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
   .cards-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.6rem;
