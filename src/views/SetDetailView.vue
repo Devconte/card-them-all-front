@@ -834,6 +834,31 @@ onMounted(() => {
   object-fit: contain; /* Ensure entire image is visible */
 }
 
+/* Mobile card adjustments */
+@media (max-width: 768px) {
+  .card-item {
+    border-radius: 6px;
+  }
+
+  .card-image {
+    max-height: 200px;
+  }
+
+  .card-info {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .card-name {
+    font-size: 12px;
+    margin-bottom: 0.3rem;
+  }
+
+  .card-rarity {
+    font-size: 10px;
+    margin: 0;
+  }
+}
+
 .card-info {
   padding: 1rem;
 }
@@ -1156,13 +1181,50 @@ onMounted(() => {
     padding: 1rem;
   }
 
-  .cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1rem;
-  }
-
   .mobile-filters-modal {
     width: 100%;
+  }
+}
+
+/* Tablets and small desktops (769px to 586px) - keep 3 columns */
+@media (max-width: 768px) and (min-width: 586px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* Mobile landscape (585px to 481px) - 2 columns */
+@media (max-width: 585px) and (min-width: 481px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+}
+
+/* Mobile portrait (480px to 361px) - 2 columns */
+@media (max-width: 480px) and (min-width: 361px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.7rem;
+  }
+}
+
+/* Very small mobile screens (360px and below) - 2 columns */
+@media (max-width: 360px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+
+  .mobile-search-filter {
+    padding: 0.8rem;
+    max-width: 95%;
+  }
+
+  .mobile-booster-section {
+    padding: 0.8rem;
+    max-width: 95%;
   }
 }
 </style>
