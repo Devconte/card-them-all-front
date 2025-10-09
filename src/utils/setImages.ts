@@ -2,8 +2,8 @@
 export const SET_IMAGES: Record<string, string> = {
   // Sets récents (Écarlate et Violet)
   'Foudre Noire': '/foudrenoire.png',
-  'Flamme Blanche': '/foudreblanche.png', // Note: pas d'image spécifique, utilise foudreblanche
-  'Rivalités Destinées': '/rivalitedestineee.png',
+  'Flamme Blanche': '/foudreblanche.png',
+  'Rivalités Destinées': '/rivalitedestine.png',
   'Aventures Ensemble': '/aventuresnesemble.png',
   'Évolutions Prismatiques': '/évolution prismatique.png',
   'Couronne Stellaire': '/couronnestelaire.png',
@@ -14,6 +14,13 @@ export const SET_IMAGES: Record<string, string> = {
   'Origine Perdue': '/origineperdue.png',
   'Astres Radieux': '/astreradieux.png',
   'Stars Étincelantes': '/staretincelantes.png',
+
+  // Sets Soleil et Lune
+  'Éclipse Cosmique': '/eclipsecosmique.png',
+  'Harmonie des Esprits': '/harmonieesprit.png',
+  'Alliance Infaillible': '/allianceinfaillible.png',
+  'Duo de Choc': '/duodechoc.png',
+  'Tonnerre Perdu': '/tonerre-perdu.png',
 
   // Autres sets avec images spécifiques
   'Fable Nébuleuse': '/fablenebuleuse.png',

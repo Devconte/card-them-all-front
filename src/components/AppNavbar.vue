@@ -1,14 +1,14 @@
 <template>
   <nav class="app-navbar">
-    <!-- Section gauche : Logo -->
+    <!-- Logo à gauche -->
     <div class="navbar-left">
       <router-link to="/" class="logo-link">
         <img src="/logocardlong.png" alt="Card Them All" class="logo" />
       </router-link>
     </div>
 
-    <!-- Section droite : Séries + Collection + Auth -->
-    <div class="navbar-right">
+    <!-- Menu desktop (caché sur mobile) -->
+    <div class="navbar-menu desktop-menu">
       <router-link to="/sets" class="navbar-item">Séries</router-link>
       <router-link to="/collection" class="navbar-item">Collection</router-link>
 
@@ -26,13 +26,75 @@
         </router-link>
       </div>
     </div>
+
+    <!-- Burger menu (visible sur mobile) -->
+    <button
+      class="burger-menu"
+      @click="toggleMenu"
+      :aria-label="isMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'"
+      :aria-expanded="isMenuOpen"
+    >
+      <span class="burger-line" :class="{ open: isMenuOpen }"></span>
+      <span class="burger-line" :class="{ open: isMenuOpen }"></span>
+      <span class="burger-line" :class="{ open: isMenuOpen }"></span>
+    </button>
+
+    <!-- Menu mobile -->
+    <div class="mobile-menu" :class="{ open: isMenuOpen }">
+      <div class="mobile-menu-content">
+        <router-link to="/sets" class="mobile-item" @click="closeMenu">Séries</router-link>
+        <router-link to="/collection" class="mobile-item" @click="closeMenu"
+          >Collection</router-link
+        >
+
+        <!-- Si connecté -->
+        <template v-if="authStore.isAuthenticated">
+          <div class="mobile-user-info">
+            <span class="mobile-username">{{ authStore.user?.username }}</span>
+          </div>
+          <router-link to="/profile" class="mobile-item" @click="closeMenu">Profil</router-link>
+          <button @click="handleLogout" class="mobile-logout">Déconnexion</button>
+        </template>
+
+        <!-- Si pas connecté -->
+        <template v-else>
+          <router-link to="/login" class="mobile-item primary" @click="closeMenu"
+            >Se connecter</router-link
+          >
+          <router-link to="/register" class="mobile-item secondary" @click="closeMenu"
+            >S'inscrire</router-link
+          >
+        </template>
+      </div>
+    </div>
+
+    <!-- Overlay pour fermer le menu -->
+    <div v-if="isMenuOpen" class="menu-overlay" @click="closeMenu"></div>
   </nav>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore();
+const router = useRouter();
+const isMenuOpen = ref(false);
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+};
+
+const closeMenu = () => {
+  isMenuOpen.value = false;
+};
+
+const handleLogout = () => {
+  authStore.logout();
+  closeMenu();
+  router.push('/');
+};
 </script>
 
 <style scoped>
@@ -47,27 +109,15 @@ const authStore = useAuthStore();
   margin-bottom: 2rem;
 }
 
-.navbar-left,
-.navbar-center,
-.navbar-right {
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-menu {
   display: flex;
   align-items: center;
   gap: 1rem;
-}
-
-.navbar-left {
-  flex: 1;
-  justify-content: flex-start;
-}
-
-.navbar-center {
-  flex: 0;
-  justify-content: center;
-}
-
-.navbar-right {
-  flex: 1;
-  justify-content: flex-end;
 }
 
 .logo-link {
@@ -257,22 +307,187 @@ const authStore = useAuthStore();
   box-shadow: 0 4px 15px rgba(43, 73, 155, 0.3);
 }
 
+/* Burger Menu */
+.burger-menu {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
+
+.desktop-menu {
+  display: flex;
+}
+
+.burger-line {
+  width: 100%;
+  height: 3px;
+  background: #2b499b;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.burger-line.open:nth-child(1) {
+  transform: translateY(10px) rotate(45deg);
+}
+
+.burger-line.open:nth-child(2) {
+  opacity: 0;
+}
+
+.burger-line.open:nth-child(3) {
+  transform: translateY(-10px) rotate(-45deg);
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  position: fixed;
+  top: 127px;
+  right: -100%;
+  width: 280px;
+  height: calc(100vh - 127px);
+  background: white;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.mobile-menu.open {
+  right: 0;
+}
+
+.mobile-menu-content {
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mobile-item {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  font-size: 18px;
+  padding: 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat Alternates', sans-serif;
+}
+
+.mobile-item:hover {
+  background: #f0f4ff;
+  color: #2b499b;
+}
+
+.mobile-item.router-link-active {
+  background: #2b499b;
+  color: white;
+}
+
+.mobile-item.primary {
+  background: #2b499b;
+  color: white;
+  text-align: center;
+  font-weight: 600;
+}
+
+.mobile-item.secondary {
+  background: #facf19;
+  color: #2b499b;
+  text-align: center;
+  font-weight: 600;
+}
+
+.mobile-user-info {
+  padding: 1rem;
+  background: #f0f4ff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.mobile-username {
+  color: #2b499b;
+  font-weight: 600;
+  font-size: 18px;
+  font-family: 'Montserrat Alternates', sans-serif;
+}
+
+.mobile-logout {
+  background: #e53e3e;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat Alternates', sans-serif;
+  margin-top: 1rem;
+}
+
+.mobile-logout:hover {
+  background: #c53030;
+}
+
+/* Menu Overlay */
+.menu-overlay {
+  position: fixed;
+  top: 127px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  transition: opacity 0.3s ease;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .app-navbar {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
+    padding: 0 2rem;
   }
 
-  .navbar-left,
-  .navbar-center,
-  .navbar-right {
-    gap: 0.5rem;
+  .logo {
+    width: 150px;
+    height: auto;
   }
 
-  .navbar-center {
-    order: -1; /* Logo en premier sur mobile */
+  .desktop-menu {
+    display: none;
+  }
+
+  .burger-menu {
+    display: flex;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-navbar {
+    padding: 0 1rem;
+    height: 80px;
+  }
+
+  .logo {
+    width: 120px;
+  }
+
+  .mobile-menu {
+    top: 80px;
+    height: calc(100vh - 80px);
+    width: 100%;
+  }
+
+  .menu-overlay {
+    top: 80px;
   }
 }
 </style>

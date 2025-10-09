@@ -22,6 +22,37 @@
       </div>
     </section>
 
+    <!-- Mobile Search and Filter Bar -->
+    <div class="mobile-search-filter">
+      <div class="search-container">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Rechercher une carte..."
+          class="search-input"
+        />
+      </div>
+      <button @click="toggleMobileFilters" class="filter-button">
+        <img src="/filterbtn.png" alt="Filtres" class="filter-icon" />
+      </button>
+    </div>
+
+    <!-- Mobile Booster Section -->
+    <div class="mobile-booster-section">
+      <button
+        @click="openBooster"
+        class="booster-btn"
+        :class="{ 'booster-btn-disabled': !authStore.isAuthenticated }"
+      >
+        <img src="/pokeball.png" alt="Pokéball" class="pokeball-icon" />
+        OUVRIR UN BOOSTER
+      </button>
+      <p v-if="!authStore.isAuthenticated" class="booster-info">
+        <span class="info-icon">ℹ️</span>
+        Connectez-vous pour ouvrir des boosters !
+      </p>
+    </div>
+
     <!-- Main Content -->
     <main class="main-content">
       <div class="content-layout">
@@ -135,6 +166,44 @@
       @open-another="openBooster"
     />
 
+    <!-- Mobile Filters Modal -->
+    <div
+      class="mobile-filters-overlay"
+      :class="{ open: isMobileFiltersOpen }"
+      @click="closeMobileFilters"
+    >
+      <div class="mobile-filters-modal" @click.stop>
+        <div class="mobile-filters-header">
+          <h3 class="mobile-filters-title">Filtres</h3>
+          <button @click="closeMobileFilters" class="close-filters-btn">
+            <span class="close-icon">×</span>
+          </button>
+        </div>
+
+        <div class="mobile-filters-content">
+          <!-- Rarity Filter -->
+          <div class="filter-section">
+            <h4 class="filter-title">RARETÉ</h4>
+            <div class="filter-options">
+              <label v-for="rarity in availableRarities" :key="rarity" class="checkbox-option">
+                <input
+                  type="checkbox"
+                  :value="rarity"
+                  v-model="selectedRarities"
+                  class="checkbox-input"
+                />
+                <span class="checkbox-label">{{ rarity }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="mobile-filters-footer">
+          <button @click="applyFilters" class="apply-filters-btn">Appliquer les filtres</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Card Details Modal -->
     <CardDetails
       v-if="selectedCard"
@@ -180,6 +249,9 @@ const boosterCards = ref<Card[]>([]);
 // Card Details Modal State
 const isCardDetailsOpen = ref(false);
 const selectedCard = ref<Card | null>(null);
+
+// Mobile Filters Modal State
+const isMobileFiltersOpen = ref(false);
 
 // Computed from store
 const cards = computed(() => setCardsStore.getSetCards(route.params.id as string));
@@ -311,13 +383,13 @@ const openBooster = async () => {
     const boosterCardsData = data.cards || data.data?.cards || data.data || [];
 
     // Extract card objects from the response structure
-    const cards = boosterCardsData.map((item: card) => {
-      const card = item.card || item;
+    const cards = boosterCardsData.map((item: Card | { card: Card }) => {
+      const cardData = 'card' in item ? item.card : item;
       // Fix rarity structure if it's a string
-      if (typeof card.rarity === 'string') {
-        card.rarity = { name: card.rarity };
+      if (typeof cardData.rarity === 'string') {
+        cardData.rarity = { id: '', name: cardData.rarity };
       }
-      return card;
+      return cardData;
     });
     // Cards extracted successfully
 
@@ -346,6 +418,19 @@ const closeBoosterModal = () => {
 const closeCardDetailsModal = () => {
   isCardDetailsOpen.value = false;
   selectedCard.value = null;
+};
+
+// Mobile Filters Methods
+const toggleMobileFilters = () => {
+  isMobileFiltersOpen.value = !isMobileFiltersOpen.value;
+};
+
+const closeMobileFilters = () => {
+  isMobileFiltersOpen.value = false;
+};
+
+const applyFilters = () => {
+  closeMobileFilters();
 };
 
 const revealCard = (index: number) => {
@@ -598,6 +683,7 @@ onMounted(() => {
   font-family: 'Montserrat Alternates', sans-serif;
   font-size: 15px;
   transition: border-color 0.3s ease;
+  box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -749,6 +835,31 @@ onMounted(() => {
   object-fit: contain; /* Ensure entire image is visible */
 }
 
+/* Mobile card adjustments */
+@media (max-width: 768px) {
+  .card-item {
+    border-radius: 6px;
+  }
+
+  .card-image {
+    max-height: 200px;
+  }
+
+  .card-info {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .card-name {
+    font-size: 12px;
+    margin-bottom: 0.3rem;
+  }
+
+  .card-rarity {
+    font-size: 10px;
+    margin: 0;
+  }
+}
+
 .card-info {
   padding: 1rem;
 }
@@ -826,19 +937,243 @@ onMounted(() => {
   font-size: 17px;
 }
 
+/* Mobile Search and Filter Bar */
+.mobile-search-filter {
+  display: none;
+  padding: 1rem;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  align-items: center;
+  gap: 1rem;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.mobile-search-filter .search-container {
+  flex: 1;
+}
+
+.mobile-search-filter .search-input {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 13px;
+  transition: border-color 0.3s ease;
+}
+
+.mobile-search-filter .search-input:focus {
+  outline: none;
+  border-color: #2b499b;
+}
+
+.mobile-search-filter .filter-button {
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-search-filter .filter-button:hover {
+  background: rgba(43, 73, 155, 0.1);
+}
+
+.mobile-search-filter .filter-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+/* Mobile Booster Section */
+.mobile-booster-section {
+  display: none;
+  padding: 1rem;
+  background: white;
+  text-align: center;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.mobile-booster-section .booster-btn {
+  width: 100%;
+  background: #facf19;
+  color: #2b499b;
+  border: none;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.mobile-booster-section .booster-btn:hover:not(.booster-btn-disabled) {
+  background: #e6ba00;
+  transform: translateY(-2px);
+}
+
+.mobile-booster-section .booster-btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mobile-booster-section .booster-info {
+  margin: 0;
+  padding: 0.8rem;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 14px;
+  color: #856404;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.mobile-booster-section .info-icon {
+  margin-right: 0.5rem;
+}
+
+/* Mobile Filters Modal */
+.mobile-filters-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1002;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobile-filters-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-filters-modal {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 320px;
+  height: 100vh;
+  background: white;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease;
+  overflow-y: auto;
+  z-index: 1003;
+}
+
+.mobile-filters-overlay.open .mobile-filters-modal {
+  right: 0;
+}
+
+.mobile-filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+}
+
+.mobile-filters-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2b499b;
+  margin: 0;
+}
+
+.close-filters-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #2b499b;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.close-filters-btn:hover {
+  background: rgba(43, 73, 155, 0.1);
+}
+
+.mobile-filters-content {
+  padding: 1.5rem;
+}
+
+.mobile-filters-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
+}
+
+.apply-filters-btn {
+  width: 100%;
+  background: #2b499b;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.apply-filters-btn:hover {
+  background: #1e3d6f;
+}
+
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1149px) {
+  .mobile-search-filter {
+    display: flex;
+  }
+
+  .mobile-booster-section {
+    display: block;
+  }
+
   .content-layout {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
 
   .sidebar {
-    order: 2;
+    display: none;
   }
 
   .cards-content {
     order: 1;
+  }
+
+  .detail-header {
+    padding: 1.5rem 1rem;
   }
 
   .header-content {
@@ -847,13 +1182,119 @@ onMounted(() => {
     text-align: center;
   }
 
+  .page-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .pokeball-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 0.5rem;
+  }
+
+  .card-count,
+  .card-counter {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
   .main-content {
     padding: 1rem;
   }
 
+  .mobile-filters-modal {
+    width: 100%;
+  }
+}
+
+/* Tablets and small desktops (1149px to 769px) - keep 4 columns */
+@media (max-width: 1149px) and (min-width: 769px) {
   .cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
+  }
+}
+
+/* Tablets (768px to 586px) - keep 3 columns */
+@media (max-width: 768px) and (min-width: 586px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* Mobile landscape (585px to 481px) - 2 columns */
+@media (max-width: 585px) and (min-width: 481px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+}
+
+/* Mobile portrait (480px to 361px) - 2 columns */
+@media (max-width: 480px) and (min-width: 361px) {
+  .detail-header {
+    padding: 1rem 0.75rem;
+  }
+
+  .page-title {
+    font-size: 1.3rem;
+  }
+
+  .pokeball-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .card-count,
+  .card-counter {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.7rem;
+  }
+}
+
+/* Very small mobile screens (360px and below) - 2 columns */
+@media (max-width: 360px) {
+  .detail-header {
+    padding: 0.8rem 0.5rem;
+  }
+
+  .page-title {
+    font-size: 1.2rem;
+  }
+
+  .pokeball-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .card-count,
+  .card-counter {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+
+  .mobile-search-filter {
+    padding: 0.8rem;
+    max-width: 95%;
+  }
+
+  .mobile-booster-section {
+    padding: 0.8rem;
+    max-width: 95%;
   }
 }
 </style>

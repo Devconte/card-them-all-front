@@ -12,10 +12,10 @@
       <h2 class="section-title">DERNIÈRES SORTIES</h2>
 
       <!-- Featured Card -->
-      <div class="featured-card">
-        <div class="featured-card-container">
-          <img src="/rivalitedestine.png" alt="Rivalités Destinées" class="featured-image" />
-          <h3 class="featured-title">RIVALITÉS DESTINÉES</h3>
+      <div v-if="series.length > 0" class="featured-card">
+        <div class="featured-card-container" @click="goToSet(series[0])">
+          <img :src="getCardImage(series[0].name)" :alt="series[0].name" class="featured-image" />
+          <h3 class="featured-title">{{ series[0].name.toUpperCase() }}</h3>
         </div>
       </div>
 
@@ -23,7 +23,12 @@
       <div v-if="loading" class="loading">Chargement des séries...</div>
       <div v-else-if="error" class="error">Erreur : {{ error }}</div>
       <div v-else class="cards-grid">
-        <div v-for="set in series" :key="set.id" class="card-item" @click="goToSet(set)">
+        <div
+          v-for="set in series.slice(1, 7)"
+          :key="set.id"
+          class="card-item"
+          @click="goToSet(set)"
+        >
           <img :src="getCardImage(set.name)" :alt="set.name" class="card-image" />
           <h4 class="card-title">{{ set.name }}</h4>
         </div>
@@ -66,7 +71,7 @@ const getCardImage = (setName: string): string => {
     'Aventures Ensemble': '/aventuresnesemble.png',
     'Évolutions Prismatiques': '/évolution prismatique.png',
     'Couronne Stellaire': '/couronnestelaire.png',
-    'Étincelles Déferlantes': '/foudreblanche.png',
+    'Étincelles Déferlantes': '/etincelledeferlante.png',
   };
 
   return imageMap[setName] || '/logocard.png'; // Image par défaut
@@ -156,6 +161,12 @@ onMounted(() => {
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(43, 73, 155, 0.2);
   border: 4px solid #facf19;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.featured-card-container:hover {
+  transform: translateY(-5px);
 }
 
 .featured-image {
@@ -322,8 +333,21 @@ onMounted(() => {
     height: 200px;
   }
 
+  .card-title {
+    font-size: 14px;
+    padding: 0.6rem 0.4rem;
+  }
+
   .featured-image {
     height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-title {
+    font-size: 12px;
+    padding: 0.5rem 0.3rem;
+    letter-spacing: 0.3px;
   }
 }
 </style>

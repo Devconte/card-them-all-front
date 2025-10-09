@@ -40,46 +40,20 @@
                   <span class="info-label">Numéro :</span>
                   <span class="info-value">{{ card.localId }}/{{ getTotalCardsInSet() }}</span>
                 </div>
-                <div v-if="card.set" class="info-item">
+                <div v-if="card.set && card.set.name" class="info-item">
                   <span class="info-label">Série :</span>
                   <span class="info-value">{{ card.set.name }}</span>
                 </div>
-                <div v-if="card.illustrator" class="info-item">
+                <div
+                  v-if="card.illustrator && card.illustrator !== null && card.illustrator !== ''"
+                  class="info-item"
+                >
                   <span class="info-label">Illustrateur :</span>
-                  <span class="info-value">{{ card.illustrator }}</span>
-                </div>
-                <div v-if="card.regulationMark" class="info-item">
-                  <span class="info-label">Marque de régulation :</span>
-                  <span class="info-value">{{ card.regulationMark }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Pokémon Stats -->
-            <div v-if="card.hp || card.types || card.stage" class="info-section">
-              <h3 class="section-title">Caractéristiques</h3>
-              <div class="info-grid">
-                <div v-if="card.hp" class="info-item">
-                  <span class="info-label">PV :</span>
-                  <span class="info-value">{{ card.hp }}</span>
-                </div>
-                <div v-if="card.stage" class="info-item">
-                  <span class="info-label">Stade :</span>
-                  <span class="info-value">{{ card.stage }}</span>
-                </div>
-                <div v-if="card.retreat" class="info-item">
-                  <span class="info-label">Coût de retraite :</span>
-                  <span class="info-value">{{ card.retreat }}</span>
-                </div>
-              </div>
-
-              <!-- Types -->
-              <div v-if="card.types && card.types.length > 0" class="types-section">
-                <span class="info-label">Types :</span>
-                <div class="types-list">
-                  <span v-for="type in card.types" :key="type" class="type-badge">
-                    {{ type }}
-                  </span>
+                  <span class="info-value">{{
+                    typeof card.illustrator === 'object'
+                      ? card.illustrator.name || card.illustrator
+                      : card.illustrator
+                  }}</span>
                 </div>
               </div>
             </div>
@@ -169,7 +143,7 @@ const getTotalCardsInSet = (): string => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1005;
   padding: 1rem;
 }
 
@@ -198,7 +172,7 @@ const getTotalCardsInSet = (): string => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 1001;
+  z-index: 1006;
   transition: background-color 0.3s ease;
 }
 
@@ -320,27 +294,6 @@ const getTotalCardsInSet = (): string => {
   font-weight: 600;
 }
 
-.types-section {
-  margin-top: 1rem;
-}
-
-.types-list {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
-}
-
-.type-badge {
-  background: #e8f4f8;
-  color: #2b499b;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-family: 'Montserrat Alternates', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-}
-
 .collection-info {
   background: #f8f9fa;
   padding: 1rem;
@@ -370,35 +323,115 @@ const getTotalCardsInSet = (): string => {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .modal-overlay {
+    padding: 0.5rem;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+
+  .modal-content {
+    max-height: calc(100vh - 1rem);
+    width: calc(100vw - 1rem);
+    border-radius: 12px;
+  }
+
   .modal-body {
     grid-template-columns: 1fr;
+    min-height: auto;
   }
 
   .card-image-section {
     padding: 1rem;
     min-height: 300px;
+    background: #f8f9fa;
+  }
+
+  .card-detail-image {
+    max-height: 280px;
+    width: auto;
   }
 
   .card-details-section {
     padding: 1rem;
+    max-height: 50vh;
+    overflow-y: auto;
   }
 
   .card-title {
-    font-size: 24px;
+    font-size: 20px;
+    margin-bottom: 0.75rem;
   }
 
-  .modal-content {
-    max-height: 95vh;
+  .close-btn {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 35px;
+    height: 35px;
+  }
+
+  .close-icon {
+    font-size: 20px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    margin-bottom: 0.75rem;
+  }
+
+  .info-section {
+    margin-bottom: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .modal-overlay {
-    padding: 0.5rem;
+    padding: 0.25rem;
+    padding-top: 1rem;
+  }
+
+  .modal-content {
+    width: calc(100vw - 0.5rem);
+    max-height: calc(100vh - 0.5rem);
+    border-radius: 8px;
+  }
+
+  .card-image-section {
+    padding: 0.75rem;
+    min-height: 250px;
+  }
+
+  .card-detail-image {
+    max-height: 220px;
+  }
+
+  .card-details-section {
+    padding: 0.75rem;
+    max-height: 60vh;
   }
 
   .card-title {
-    font-size: 20px;
+    font-size: 18px;
+    margin-bottom: 0.5rem;
+  }
+
+  .close-btn {
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 30px;
+    height: 30px;
+  }
+
+  .close-icon {
+    font-size: 18px;
+  }
+
+  .section-title {
+    font-size: 14px;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-section {
+    margin-bottom: 1rem;
   }
 
   .info-grid {
@@ -409,6 +442,26 @@ const getTotalCardsInSet = (): string => {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
+    padding: 0.4rem 0;
+  }
+
+  .info-label,
+  .info-value {
+    font-size: 13px;
+  }
+
+  .card-badges {
+    gap: 0.3rem;
+  }
+
+  .rarity-badge,
+  .category-badge {
+    font-size: 11px;
+    padding: 0.2rem 0.6rem;
+  }
+
+  .quantity-value {
+    font-size: 20px;
   }
 }
 </style>

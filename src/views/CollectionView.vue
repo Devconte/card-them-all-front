@@ -30,9 +30,24 @@
           </div>
         </div>
 
+        <!-- Mobile Search and Filter Bar -->
+        <div class="mobile-search-filter">
+          <div class="search-container">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Rechercher une carte..."
+              class="search-input"
+            />
+          </div>
+          <button @click="toggleMobileFilters" class="filter-button">
+            <img src="/filterbtn.png" alt="Filtres" class="filter-icon" />
+          </button>
+        </div>
+
         <div class="content-layout">
           <!-- Sidebar Filters -->
-          <aside class="sidebar">
+          <aside class="sidebar desktop-sidebar">
             <div class="filters-container">
               <!-- Search -->
               <div class="filter-section">
@@ -161,6 +176,61 @@
       :isOpen="isCardDetailsOpen"
       @close="closeCardDetails"
     />
+
+    <!-- Mobile Filters Modal -->
+    <div
+      class="mobile-filters-overlay"
+      :class="{ open: isMobileFiltersOpen }"
+      @click="closeMobileFilters"
+    >
+      <div class="mobile-filters-modal" @click.stop>
+        <div class="mobile-filters-header">
+          <h3 class="mobile-filters-title">Filtres</h3>
+          <button @click="closeMobileFilters" class="close-filters-btn">
+            <span class="close-icon">×</span>
+          </button>
+        </div>
+
+        <div class="mobile-filters-content">
+          <!-- Series Filter -->
+          <div class="filter-section">
+            <h4 class="filter-title">Série</h4>
+            <div class="filter-options">
+              <label class="radio-option">
+                <input type="radio" v-model="selectedSeries" value="" class="radio-input" />
+                <span class="radio-label">Toutes</span>
+              </label>
+              <label v-for="series in availableSeries" :key="series" class="radio-option">
+                <input type="radio" v-model="selectedSeries" :value="series" class="radio-input" />
+                <span class="radio-label">{{ series }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Rarity Filter -->
+          <div class="filter-section">
+            <h4 class="filter-title">Rareté</h4>
+            <div class="filter-options">
+              <label class="checkbox-option">
+                <input type="checkbox" value="" v-model="selectedRarities" class="checkbox-input" />
+                <span class="checkbox-label">Toutes</span>
+              </label>
+              <label v-for="rarity in availableRarities" :key="rarity" class="checkbox-option">
+                <input
+                  type="checkbox"
+                  :value="rarity"
+                  v-model="selectedRarities"
+                  class="checkbox-input"
+                />
+                <span class="checkbox-label">{{ rarity }}</span>
+              </label>
+            </div>
+          </div>
+
+          <button @click="applyFilters" class="apply-filters-btn">Appliquer les filtres</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -336,6 +406,9 @@ const handleImageError = (event: Event) => {
 const isCardDetailsOpen = ref(false);
 const selectedCard = ref<Card | null>(null);
 
+// Mobile Filters Modal State
+const isMobileFiltersOpen = ref(false);
+
 const openCardDetails = (userCard: UserCard) => {
   selectedCard.value = userCard.card as Card;
   isCardDetailsOpen.value = true;
@@ -344,6 +417,19 @@ const openCardDetails = (userCard: UserCard) => {
 const closeCardDetails = () => {
   isCardDetailsOpen.value = false;
   selectedCard.value = null;
+};
+
+// Mobile Filters Methods
+const toggleMobileFilters = () => {
+  isMobileFiltersOpen.value = !isMobileFiltersOpen.value;
+};
+
+const closeMobileFilters = () => {
+  isMobileFiltersOpen.value = false;
+};
+
+const applyFilters = () => {
+  closeMobileFilters();
 };
 </script>
 
@@ -444,7 +530,7 @@ const closeCardDetails = () => {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   margin-top: 2rem;
 }
@@ -538,6 +624,7 @@ const closeCardDetails = () => {
   font-family: 'Montserrat Alternates', sans-serif;
   font-size: 14px;
   transition: border-color 0.3s ease;
+  box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -640,15 +727,216 @@ const closeCardDetails = () => {
   line-height: 1.1;
 }
 
+/* Mobile Search and Filter Bar */
+.mobile-search-filter {
+  display: none;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  align-items: center;
+  gap: 1rem;
+  max-width: 90%;
+  margin: 0 auto 1rem auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-search-filter .search-container {
+  flex: 1;
+}
+
+.mobile-search-filter .search-input {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 13px;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.mobile-search-filter .search-input:focus {
+  outline: none;
+  border-color: #2b499b;
+}
+
+.mobile-search-filter .filter-button {
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-search-filter .filter-button:hover {
+  background: rgba(43, 73, 155, 0.1);
+}
+
+.mobile-search-filter .filter-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+/* Mobile Filters Modal */
+.mobile-filters-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1002;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.mobile-filters-overlay.open {
+  display: flex;
+}
+
+.mobile-filters-modal {
+  background: white;
+  border-radius: 12px;
+  width: 320px;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 1003;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.mobile-filters-title {
+  margin: 0;
+  color: #2b499b;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.close-filters-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.close-filters-btn:hover {
+  background: #f0f0f0;
+}
+
+.mobile-filters-content {
+  padding: 1rem;
+}
+
+.mobile-filters-content .filter-section {
+  margin-bottom: 1.5rem;
+}
+
+.mobile-filters-content .filter-title {
+  margin: 0 0 0.75rem 0;
+  color: #2b499b;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.mobile-filters-content .filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.radio-option,
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.radio-option:hover,
+.checkbox-option:hover {
+  background: #f8f9fa;
+}
+
+.radio-input,
+.checkbox-input {
+  margin: 0;
+}
+
+.radio-label,
+.checkbox-label {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.apply-filters-btn {
+  width: 100%;
+  background: #2b499b;
+  color: white;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 8px;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+.apply-filters-btn:hover {
+  background: #1e3d6f;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+  .mobile-search-filter {
+    display: flex;
+  }
+
   .content-layout {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
 
+  .desktop-sidebar {
+    display: none;
+  }
+
+  .mobile-filters-modal {
+    width: 100%;
+  }
+
   .sidebar {
     order: 2;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
   }
 
   .cards-content {
@@ -656,28 +944,37 @@ const closeCardDetails = () => {
   }
 
   .quick-stats-bar {
-    gap: 0.5rem;
+    gap: 0.3rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    max-width: 280px;
+    margin: 0 auto;
   }
 
   .stat-chip {
-    padding: 0.4rem 0.8rem;
-    min-width: 60px;
+    padding: 0.25rem 0.5rem;
+    min-width: 45px;
   }
 
   .stat-chip .stat-value {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
   }
 
   .stat-chip .stat-label {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
   }
 
   .stat-chip.favorite {
-    min-width: 100px;
+    min-width: 70px;
   }
 
   .stat-chip.favorite .stat-value {
     font-size: 0.9rem;
+  }
+
+  .collection-header h1 {
+    font-size: 28px;
   }
 }
 
@@ -800,6 +1097,13 @@ const closeCardDetails = () => {
 @media (max-width: 480px) {
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 360px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
   }
 }
 

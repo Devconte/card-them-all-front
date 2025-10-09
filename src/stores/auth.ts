@@ -103,8 +103,15 @@ export const useAuthStore = defineStore('auth', () => {
       return true;
     } catch (err: unknown) {
       const axiosError = err as AxiosError;
+      let errorMessage = axiosError?.response?.data?.message || 'Erreur de connexion';
+
+      // Traduire les messages d'erreur du backend
+      if (errorMessage === 'Invalid credentials') {
+        errorMessage = 'Email ou mot de passe incorrect';
+      }
+
       error.value = {
-        message: axiosError?.response?.data?.message || 'Erreur de connexion',
+        message: errorMessage,
         status: axiosError?.response?.status,
         field: axiosError?.response?.data?.field,
       };

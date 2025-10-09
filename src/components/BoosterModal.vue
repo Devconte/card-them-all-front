@@ -6,6 +6,23 @@
 
     <!-- Cards Container (Center) -->
     <div class="cards-container" @click.stop>
+      <!-- Top Actions (Mobile) -->
+      <div class="top-actions">
+        <button
+          v-if="!isRevealed"
+          @click="revealCards"
+          class="action-btn primary"
+          :disabled="isRevealing"
+        >
+          {{ isRevealing ? 'Ouverture...' : 'Ouvrir le Booster' }}
+        </button>
+
+        <div v-if="isRevealed" class="revealed-actions">
+          <button @click="openAnother" class="action-btn secondary">Ouvrir un autre Booster</button>
+          <button @click="closeModal" class="action-btn primary">Fermer</button>
+        </div>
+      </div>
+
       <!-- Cards Grid -->
       <div class="cards-grid">
         <div
@@ -117,8 +134,9 @@ const openAnother = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1004;
   padding: 2rem;
+  overflow-y: auto;
 }
 
 /* Close Button */
@@ -156,6 +174,9 @@ const openAnother = () => {
   gap: 3rem;
   max-width: 1200px;
   width: 100%;
+  min-height: 100vh;
+  padding: 6rem 0 4rem 0;
+  box-sizing: border-box;
 }
 
 /* Cards Grid */
@@ -207,6 +228,15 @@ const openAnother = () => {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+/* Top Actions (Mobile) */
+.top-actions {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 /* Bottom Actions */
@@ -277,26 +307,47 @@ const openAnother = () => {
 
 @media (max-width: 768px) {
   .booster-overlay {
-    padding: 1rem;
+    padding: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .cards-container {
+    padding: 2rem 0 2rem 0;
+    gap: 1.5rem;
+  }
+
+  .top-actions {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+
+  .bottom-actions {
+    display: none;
   }
 
   .cards-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.8rem;
+    justify-items: center;
+  }
+
+  .card-slot {
+    max-width: 140px;
+    width: 100%;
   }
 
   .close-btn {
-    top: 1rem;
-    right: 1rem;
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
   }
 
   .action-btn {
-    font-size: 1rem;
-    padding: 0.8rem 1.5rem;
-    min-width: 150px;
+    font-size: 0.9rem;
+    padding: 0.7rem 1.2rem;
+    min-width: 160px;
   }
 
   .revealed-actions {
@@ -306,9 +357,49 @@ const openAnother = () => {
 }
 
 @media (max-width: 480px) {
+  .booster-overlay {
+    padding: 0.25rem;
+  }
+
+  .cards-container {
+    padding: 1.5rem 0 1.5rem 0;
+    gap: 1.2rem;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+    justify-items: center;
+  }
+
+  .card-slot {
+    max-width: 120px;
+    width: 100%;
+  }
+
+  .action-btn {
+    font-size: 0.8rem;
+    padding: 0.6rem 1rem;
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 360px) {
   .cards-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem;
+    justify-items: center;
+  }
+
+  .card-slot {
+    max-width: 100px;
+    width: 100%;
+  }
+
+  .action-btn {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.8rem;
+    min-width: 120px;
   }
 }
 </style>
