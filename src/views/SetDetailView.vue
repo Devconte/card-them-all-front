@@ -683,6 +683,7 @@ onMounted(() => {
   font-family: 'Montserrat Alternates', sans-serif;
   font-size: 15px;
   transition: border-color 0.3s ease;
+  box-sizing: border-box;
 }
 
 .search-input:focus {
