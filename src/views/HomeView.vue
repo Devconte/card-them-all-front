@@ -333,8 +333,21 @@ onMounted(() => {
     height: 200px;
   }
 
+  .card-title {
+    font-size: 14px;
+    padding: 0.6rem 0.4rem;
+  }
+
   .featured-image {
     height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-title {
+    font-size: 12px;
+    padding: 0.5rem 0.3rem;
+    letter-spacing: 0.3px;
   }
 }
 </style>
