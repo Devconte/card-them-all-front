@@ -1149,7 +1149,7 @@ onMounted(() => {
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1149px) {
   .mobile-search-filter {
     display: flex;
   }
@@ -1186,7 +1186,15 @@ onMounted(() => {
   }
 }
 
-/* Tablets and small desktops (769px to 586px) - keep 3 columns */
+/* Tablets and small desktops (1149px to 769px) - keep 4 columns */
+@media (max-width: 1149px) and (min-width: 769px) {
+  .cards-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* Tablets (768px to 586px) - keep 3 columns */
 @media (max-width: 768px) and (min-width: 586px) {
   .cards-grid {
     grid-template-columns: repeat(3, 1fr);
