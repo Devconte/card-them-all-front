@@ -120,6 +120,23 @@ onMounted(() => {
   position: relative;
 }
 
+.main-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 20px,
+    rgba(255, 192, 203, 0.1) 20px,
+    rgba(255, 192, 203, 0.1) 21px
+  );
+  pointer-events: none;
+}
+
 .section-title {
   text-align: center;
   color: #2b499b;

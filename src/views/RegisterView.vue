@@ -2,22 +2,26 @@
   <div class="register-page">
     <!-- Bouton retour accueil -->
     <div class="back-button">
-      <router-link to="/" class="back-link"> ← Retour à l'accueil </router-link>
+      <router-link to="/" class="back-link">
+        <span class="back-arrow">←</span>
+      </router-link>
     </div>
 
+    <!-- Contenu principal -->
     <div class="auth-container">
       <div class="auth-content">
-        <!-- Formulaire d'inscription -->
+        <!-- Formulaire -->
         <div class="auth-form-section">
-          <!-- Logo en haut à gauche -->
-          <div class="auth-logo-top">
-            <img src="/logocardlong.png" alt="Card Them All" class="logo-image" />
-          </div>
+          <div class="form-wrapper">
+            <!-- Logo centré -->
+            <div class="logo-container">
+              <img src="/logocardlong.png" alt="Card Them All" class="logo-image" />
+            </div>
 
-          <div class="auth-form-card">
-            <!-- Titre en haut à gauche du formulaire -->
-            <h2 class="auth-title">Inscription</h2>
+            <!-- Titre -->
+            <h1 class="page-title">CRÉER VOTRE COMPTE</h1>
 
+            <!-- Formulaire -->
             <form @submit.prevent="handleRegister" class="auth-form">
               <div class="form-group">
                 <label for="username">Nom du compte</label>
@@ -92,7 +96,8 @@
               </button>
             </form>
 
-            <div class="auth-footer">
+            <!-- Lien connexion -->
+            <div class="login-link-container">
               <p class="login-prompt">
                 Vous avez déjà un compte ?
                 <router-link to="/login" class="login-link">Se connecter</router-link>
@@ -101,7 +106,7 @@
           </div>
         </div>
 
-        <!-- Illustration -->
+        <!-- Illustration (desktop only) -->
         <div class="auth-illustration">
           <img src="/bannerlogin.png" alt="Pokémon illustration" class="illustration-image" />
         </div>
@@ -199,28 +204,33 @@ const handleRegister = async () => {
 
 .back-button {
   position: absolute;
-  top: 2rem;
-  left: 2rem;
+  top: 1rem;
+  left: 1rem;
   z-index: 10;
 }
 
 .back-link {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  padding: 0.75rem 1.5rem;
-  background: white;
-  color: #2b499b;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #2b499b;
+  color: white;
   text-decoration: none;
   border-radius: 8px;
   font-weight: 600;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
 .back-link:hover {
-  background: #f0f4ff;
+  background: #1e3a8a;
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.back-arrow {
+  font-size: 20px;
+  font-weight: bold;
 }
 
 .auth-container {
@@ -248,63 +258,43 @@ const handleRegister = async () => {
 .auth-form-section {
   padding: 4rem 5rem;
   background: white;
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
 }
 
-.auth-form-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.02) 2px,
-    rgba(0, 0, 0, 0.02) 4px
-  );
-  pointer-events: none;
-}
-
-.auth-form-card {
-  position: relative;
-  z-index: 1;
+.form-wrapper {
   width: 100%;
   max-width: 500px;
 }
 
-/* Logo en haut à gauche */
-.auth-logo-top {
-  position: absolute;
-  top: 6rem;
-  left: 4rem;
-  z-index: 2;
+.logo-container {
+  margin-bottom: 3rem;
+  text-align: center;
 }
 
 .logo-image {
-  width: 150px;
+  width: 250px;
   height: auto;
 }
 
-/* Titre du formulaire */
-.auth-title {
-  font-family: 'Luckiest Guy', cursive;
-  font-size: 35px;
+.page-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
   color: #333;
-  margin: 0 0 2rem 0;
-  text-align: left;
+  margin: 0 0 3rem 0;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .auth-form {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .form-group {
@@ -315,26 +305,27 @@ const handleRegister = async () => {
 
 .form-group label {
   color: #333;
-  font-weight: 400;
+  font-weight: 500;
   font-size: 17px;
-  margin-bottom: 0.25rem;
+  font-family: 'Montserrat Alternates', sans-serif;
 }
 
 .form-input {
-  padding: 1rem;
-  border: 1px solid #e0e0e0;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 17px;
   font-weight: 400;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
   transition: all 0.3s ease;
   font-family: 'Montserrat Alternates', sans-serif;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-input:focus {
   outline: none;
   border-color: #2b499b;
-  background-color: white;
   box-shadow: 0 0 0 3px rgba(43, 73, 155, 0.1);
 }
 
@@ -345,24 +336,26 @@ const handleRegister = async () => {
 
 .info-message {
   color: #2b499b;
-  font-size: 0.9rem;
+  font-size: 15px;
   text-align: center;
   padding: 0.75rem;
   background: #f0f4ff;
   border: 1px solid #d1e7ff;
   border-radius: 8px;
   margin-bottom: 0.5rem;
+  font-family: 'Montserrat Alternates', sans-serif;
 }
 
 .error-message {
   color: #e53e3e;
-  font-size: 0.9rem;
+  font-size: 15px;
   text-align: center;
   padding: 0.75rem;
   background: #fef5f5;
   border: 1px solid #fed7d7;
   border-radius: 8px;
   margin-bottom: 0.5rem;
+  font-family: 'Montserrat Alternates', sans-serif;
 }
 
 .primary-btn {
@@ -372,10 +365,11 @@ const handleRegister = async () => {
   padding: 1rem 2rem;
   border-radius: 8px;
   font-size: 17px;
-  font-weight: 400;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: 'Montserrat Alternates', sans-serif;
+  width: 100%;
   margin-top: 1rem;
 }
 
@@ -391,7 +385,7 @@ const handleRegister = async () => {
   transform: none;
 }
 
-.auth-footer {
+.login-link-container {
   text-align: center;
   margin-top: 2rem;
   padding-top: 1.5rem;
@@ -400,8 +394,9 @@ const handleRegister = async () => {
 
 .login-prompt {
   color: #666;
-  font-size: 0.95rem;
+  font-size: 15px;
   margin: 0;
+  font-family: 'Montserrat Alternates', sans-serif;
 }
 
 .login-link {
@@ -423,74 +418,53 @@ const handleRegister = async () => {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   padding: 0;
   min-height: 100vh;
-  position: relative;
 }
 
 .illustration-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 0;
-  border: none;
-  box-shadow: none;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
   .auth-content {
     grid-template-columns: 1fr;
-    gap: 0;
-    max-width: 100%;
-  }
-
-  .auth-illustration {
-    order: -1;
-    padding: 0;
-    min-height: 50vh;
-  }
-
-  .auth-form-section {
-    padding: 3rem 2rem;
-    min-height: 50vh;
-  }
-
-  .illustration-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-@media (max-width: 768px) {
-  .register-page {
-    padding: 0;
-  }
-
-  .back-button {
-    top: 1rem;
-    left: 1rem;
-  }
-
-  .auth-content {
-    border-radius: 0;
-    margin-top: 0;
-  }
-
-  .auth-form-section {
-    padding: 2rem 1.5rem;
-    min-height: 100vh;
   }
 
   .auth-illustration {
     display: none;
   }
 
-  .auth-logo h1 {
-    font-size: 1.5rem;
+  .auth-form-section {
+    padding: 3rem 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .register-page {
+    background-color: #ffffff;
   }
 
-  .auth-header h2 {
-    font-size: 1.4rem;
+  .auth-form-section {
+    padding: 2rem 1.5rem;
+  }
+
+  .form-wrapper {
+    max-width: 400px;
+  }
+
+  .logo-image {
+    width: 200px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .login-link-container {
+    border-top: none;
+    padding-top: 0;
   }
 }
 
@@ -499,12 +473,27 @@ const handleRegister = async () => {
     padding: 1.5rem 1rem;
   }
 
-  .auth-logo h1 {
-    font-size: 1.3rem;
+  .form-wrapper {
+    max-width: 320px;
   }
 
-  .auth-header h2 {
-    font-size: 1.2rem;
+  .logo-image {
+    width: 160px;
+  }
+
+  .page-title {
+    font-size: 20px;
+    margin-bottom: 2rem;
+  }
+
+  .form-input {
+    padding: 0.75rem 1rem;
+    font-size: 16px;
+  }
+
+  .primary-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 16px;
   }
 }
 </style>
