@@ -4,7 +4,8 @@
       <!-- Left Section - Logo and Navigation -->
       <div class="footer-left">
         <div class="footer-logo">
-          <img src="/logocardlong.png" alt="Card Them All" class="footer-logo-img" />
+          <img src="/logocardlong.png" alt="Card Them All" class="footer-logo-desktop" />
+          <img src="/logocard.png" alt="Card Them All" class="footer-logo-mobile" />
         </div>
         <div class="footer-nav">
           <router-link to="/sets" class="footer-link">Sets</router-link>
@@ -39,6 +40,26 @@
         </div>
       </div>
     </div>
+
+    <!-- Mobile footer bottom -->
+    <div class="footer-bottom-mobile">
+      <div class="footer-bottom-left">
+        <p class="footer-copyright-mobile">@2025 CardThemAll</p>
+      </div>
+      <div class="footer-bottom-right">
+        <div class="footer-social-mobile">
+          <a href="#" class="social-link facebook">
+            <span class="social-icon">f</span>
+          </a>
+          <a href="#" class="social-link instagram">
+            <span class="social-icon">📷</span>
+          </a>
+          <a href="#" class="social-link twitter">
+            <span class="social-icon">X</span>
+          </a>
+        </div>
+      </div>
+    </div>
   </footer>
 </template>
 
@@ -51,7 +72,16 @@
   background: #2b499b;
   padding: 2rem 0 3.5rem 0;
   margin-top: 4rem;
-  border-radius: 20px 20px 0 0;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  width: 100vw;
+}
+
+/* Desktop specific styles */
+@media (min-width: 769px) {
+  .app-footer {
+    border-radius: 20px 20px 0 0;
+  }
 }
 
 .footer-content {
@@ -78,9 +108,14 @@
   gap: 0.5rem;
 }
 
-.footer-logo-img {
+.footer-logo-desktop {
   height: 80px;
   width: auto;
+  display: block;
+}
+
+.footer-logo-mobile {
+  display: none;
 }
 
 .footer-brand {
@@ -197,38 +232,100 @@
   font-size: 1.1rem;
 }
 
+/* Mobile footer bottom styles */
+.footer-bottom-mobile {
+  display: none;
+  padding: 1rem 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 2rem;
+}
+
+.footer-bottom-left {
+  flex: 1;
+}
+
+.footer-bottom-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footer-copyright-mobile {
+  color: #e8e8e8;
+  font-size: 14px;
+  margin: 0;
+  font-family: 'Montserrat Alternates', sans-serif;
+}
+
+.footer-social-mobile {
+  display: flex;
+  gap: 0.8rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+  .app-footer {
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    width: 100vw;
+    border-radius: 0;
+    padding: 2rem 0;
+  }
+
   .footer-content {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
     text-align: center;
-    min-height: 200px;
+    min-height: auto;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .footer-left {
+    align-items: center;
+  }
+
+  .footer-logo-desktop {
+    display: none;
+  }
+
+  .footer-logo-mobile {
+    display: block;
+    height: 86px;
+    width: 74px;
+    object-fit: contain;
   }
 
   .footer-center {
     position: static;
     transform: none;
-    margin-top: 2rem;
+    order: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .footer-right {
-    align-items: center;
-    justify-self: center;
+    display: none;
   }
 
   .footer-nav {
     justify-content: center;
   }
 
-  .footer-social {
-    justify-content: center;
+  .footer-copyright {
+    display: none;
   }
 
   .footer-disclaimer {
     font-size: 13px;
     line-height: 1.5;
     padding: 0 0.5rem;
+  }
+
+  .footer-bottom-mobile {
+    display: flex;
+    align-items: center;
   }
 }
 
@@ -239,6 +336,12 @@
 
   .footer-content {
     padding: 0 1rem;
+    max-width: 320px;
+  }
+
+  .footer-logo-mobile {
+    height: 60px;
+    width: 60px;
   }
 
   .footer-nav {
@@ -250,6 +353,10 @@
     font-size: 12px;
     line-height: 1.4;
     padding: 0 0.25rem;
+  }
+
+  .footer-bottom-mobile {
+    padding: 1rem;
   }
 }
 </style>
