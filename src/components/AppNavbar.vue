@@ -3,8 +3,7 @@
     <!-- Logo à gauche -->
     <div class="navbar-left">
       <router-link to="/" class="logo-link">
-        <img src="/logocardlong.png" alt="Card Them All" class="logo logo-desktop" />
-        <img src="/logocard.png" alt="Card Them All" class="logo logo-mobile" />
+        <img src="/logocardlong.png" alt="Card Them All" class="logo" />
       </router-link>
     </div>
 
@@ -127,19 +126,9 @@ const handleLogout = () => {
 }
 
 .logo {
-  transition: transform 0.3s ease;
-}
-
-.logo-desktop {
   width: 212px;
   height: 93px;
-}
-
-.logo-mobile {
-  width: 80px;
-  height: 80px;
-  display: none;
-  object-fit: contain;
+  transition: transform 0.3s ease;
 }
 
 .logo-link:hover .logo {
@@ -467,14 +456,9 @@ const handleLogout = () => {
     padding: 0 2rem;
   }
 
-  .logo-desktop {
-    display: none;
-  }
-
-  .logo-mobile {
-    display: block;
-    width: 74px;
-    height: 86px;
+  .logo {
+    width: 150px;
+    height: auto;
   }
 
   .desktop-menu {
@@ -492,9 +476,8 @@ const handleLogout = () => {
     height: 80px;
   }
 
-  .logo-mobile {
-    width: 60px;
-    height: 60px;
+  .logo {
+    width: 120px;
   }
 
   .mobile-menu {
