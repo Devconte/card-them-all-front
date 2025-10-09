@@ -71,7 +71,7 @@ const getCardImage = (setName: string): string => {
     'Aventures Ensemble': '/aventuresnesemble.png',
     'Évolutions Prismatiques': '/évolution prismatique.png',
     'Couronne Stellaire': '/couronnestelaire.png',
-    'Étincelles Déferlantes': '/foudreblanche.png',
+    'Étincelles Déferlantes': '/etincelledeferlante.png',
   };
 
   return imageMap[setName] || '/logocard.png'; // Image par défaut
