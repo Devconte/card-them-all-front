@@ -15,6 +15,31 @@ services:
     networks:
       - app-network
 
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - certbot_certs:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    depends_on:
+      - frontend
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot_certs:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    command: certonly --webroot --webroot-path=/var/www/certbot --email your-email@example.com --agree-tos --no-eff-email -d cardthemall.fr -d www.cardthemall.fr
+    networks:
+      - app-network
+
 volumes:
   node_modules:
     driver: local
@@ -22,6 +47,8 @@ volumes:
       type: none
       o: bind
       device: ./node_modules
+  certbot_certs:
+  certbot_www:
 
 networks:
   app-network:
