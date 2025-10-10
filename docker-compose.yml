@@ -3,16 +3,27 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: card-frontend-dev
     ports:
-      - '8080:80'
+      - '5173:5173'
+    volumes:
+      - ./:/app
+      - /app/node_modules
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
+      - VITE_HOST=0.0.0.0
     restart: unless-stopped
     networks:
-      - card-network
+      - app-network
+
+volumes:
+  node_modules:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./node_modules
 
 networks:
-  card-network:
-    external: true
-    name: card-them-all-back_card-network
+  app-network:
+    name: card-them-all-shared-network
+    driver: bridge
