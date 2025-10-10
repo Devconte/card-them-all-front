@@ -1,17 +1,20 @@
 services:
-  frontend:  
+  frontend:
     build:
       context: .
-      dockerfile: Dockerfile   
+      dockerfile: Dockerfile
     restart: unless-stopped
-    container_name: cardthemall-frontend
-    # Pas de ports exposés - le nginx du backend fait le proxy
+    # container_name: cardthemall-frontend
     networks:
-      - app-network
-      - frontend-network
+      - public-net
+    # Si tu veux que nginx puisse l'atteindre via "cardthemall-frontend", ajoute un alias :
+    network_mode: ""  # ignore; juste pour signaler que below is networks config
+    # networks:
+    #   public-net:
+    #     aliases:
+    #       - cardthemall-frontend
+
 networks:
-  app-network:
-    name: card-them-all-shared-network
-  frontend-network:
+  public-net:
     external: true
     name: card-them-all-shared-network
