@@ -165,7 +165,18 @@ const selectedRarities = ref<string[]>([]);
 
 // Booster Modal State
 const isBoosterModalOpen = ref(false);
-const boosterCards = ref<Card[]>([]);
+// Type for BoosterModal cards (simplified version of Card)
+interface BoosterCard {
+  id: string;
+  name: string;
+  image: string;
+  rarity?: {
+    name: string;
+  };
+  revealed?: boolean;
+}
+
+const boosterCards = ref<BoosterCard[]>([]);
 
 // Computed from store
 const cards = computed(() => setCardsStore.getSetCards(route.params.id as string));
@@ -308,15 +319,18 @@ const openBooster = async () => {
 
     // Prepare cards for modal with optimized images
     const cardsWithImages = cards.map((card: Card) => ({
-      ...card,
-      image: getCardImage(card),
+      id: card.id,
+      name: card.name,
+      image: getCardImage(card) || '/placeholder.png', // Ensure image is always a string
+      rarity: card.rarity,
       revealed: false,
     }));
 
     boosterCards.value = cardsWithImages;
     isBoosterModalOpen.value = true;
   } catch (error) {
-    alert(`Erreur lors de l'ouverture du booster: ${error.message}`);
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+    alert(`Erreur lors de l'ouverture du booster: ${errorMessage}`);
   }
 };
 
