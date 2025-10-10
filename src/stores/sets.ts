@@ -35,7 +35,7 @@ export const useSetsStore = defineStore('sets', () => {
   // Check if a set has cards with images by fetching the cards
   const hasCardsWithImages = async (setId: string): Promise<boolean> => {
     try {
-      const response = await fetch(`http://localhost:3000/cards/sets/${setId}`);
+      const response = await fetch((import.meta.env.VITE_API_URL || "http://localhost:3000") + "/cards/sets/" + setId);
       if (!response.ok) return false;
 
       const data = await response.json();
@@ -75,7 +75,7 @@ export const useSetsStore = defineStore('sets', () => {
     error.value = null;
 
     try {
-      const response = await axios.get('http://localhost:3000/sets');
+      const response = await axios.get((import.meta.env.VITE_API_URL || "http://localhost:3000") + "/sets");
       // Fais ça :
       const apiResponse = response.data;
       const setsData = apiResponse.data as Set[];
