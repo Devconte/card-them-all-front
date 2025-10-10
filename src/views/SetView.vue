@@ -174,7 +174,7 @@ const getOwnedCardsCount = (setId: string): number => {
   if (!authStore.isAuthenticated || !collection.value) return 0;
 
   // Compter les cartes de ce set dans la collection
-  return collection.value.filter((userCard) => userCard.card.set?.id === setId).length;
+  return collection.value.filter((userCard) => userCard.card.set && (userCard.card.set as any).id === setId).length;
 };
 
 const getSerieImage = (serieName: string): string => {
