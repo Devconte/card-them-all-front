@@ -7,13 +7,24 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
-# Copy project files
+# Copy all project files
 COPY . .
 
-# Expose port for development
-EXPOSE 5173
+# Build the app for production
+RUN npm run build
 
-# Start development server
-CMD ["npm", "run", "dev"]
+# Stage 2: Serve the built app with Nginx
+FROM nginx:1.23-alpine AS production
+
+# Copy built files from the previous stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy custom nginx config if present
+COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

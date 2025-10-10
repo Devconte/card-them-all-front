@@ -4,18 +4,26 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5173:5173"
+      - '5173:5173'
     volumes:
       - ./:/app
-      - node_modules:/app/node_modules
+      - /app/node_modules
     environment:
       - NODE_ENV=development
       - VITE_HOST=0.0.0.0
     restart: unless-stopped
+    networks:
+      - app-network
 
 volumes:
-  node_modules: {}
+  node_modules:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./node_modules
 
 networks:
-  default:
-    name: card-them-all-front_default  # 🔥 Nom de réseau stable pour qu’il soit accessible par le backend/nginx
+  app-network:
+    name: card-them-all-shared-network
+    driver: bridge
