@@ -50,8 +50,8 @@
                 >
                   <span class="info-label">Illustrateur :</span>
                   <span class="info-value">{{
-                    typeof card.illustrator === 'object'
-                      ? card.illustrator.name || card.illustrator
+                    typeof card.illustrator === 'object' && card.illustrator !== null
+                      ? (card.illustrator as any).name || card.illustrator
                       : card.illustrator
                   }}</span>
                 </div>
