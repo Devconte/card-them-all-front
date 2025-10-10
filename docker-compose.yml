@@ -3,9 +3,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: unless-stopped
-    ports:
-      - '80:80'
+    restart: unless-stopped   
+    expose:
+      - "5173"
     networks:
       - app-network   
 networks:
