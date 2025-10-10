@@ -75,7 +75,7 @@ export const useSetsStore = defineStore('sets', () => {
     error.value = null;
 
     try {
-      const response = await axios.get((import.meta.env.VITE_API_URL || "http://localhost:3000") + "/sets");
+      const response = await axios.get( "https://backend.cardthemall.fr/sets");
       // Fais ça :
       const apiResponse = response.data;
       const setsData = apiResponse.data as Set[];
