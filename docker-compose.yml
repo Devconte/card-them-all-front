@@ -4,9 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile   
     restart: unless-stopped
+    container_name: cardthemall-frontend
     networks:
       - app-network
-container_name: cardthemall-frontend
 networks:
   app-network:
     name: card-them-all-shared-network
