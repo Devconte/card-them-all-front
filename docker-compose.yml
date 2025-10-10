@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     # container_name: cardthemall-frontend
     networks:
-      - public-net
+      - app-network
     # Si tu veux que nginx puisse l'atteindre via "cardthemall-frontend", ajoute un alias :
     network_mode: ""  # ignore; juste pour signaler que below is networks config
     # networks:
@@ -15,6 +15,6 @@ services:
     #       - cardthemall-frontend
 
 networks:
-  public-net:
-    external: true
-    name: card-them-all-shared-network
+  app-network:
+    name: card-them-all-front_app-network
+    external: true 
