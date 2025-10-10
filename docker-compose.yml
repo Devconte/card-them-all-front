@@ -11,4 +11,4 @@ services:
 networks:
   app-network:
     name: card-them-all-front_app-network
-    external: true 
+    driver: bridge 
