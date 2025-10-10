@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import axios, { type AxiosResponse, type AxiosError as AxiosErrorType } from 'axios';
 
 // Configuration d'axios
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || "https://backend.cardthemall.fr";
+axios.defaults.baseURL = "https://backend.cardthemall.fr";
 
 // Extension du type pour ajouter _retry
 declare module 'axios' {

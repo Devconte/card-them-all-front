@@ -333,7 +333,7 @@ const fetchSetDetails = async () => {
   loading.value = true;
   try {
     // Fetch set details
-    const response = await fetch(`http://localhost:3000/sets/${setId}`);
+    const response = await fetch(`https://backend.cardthemall.fr/sets/${setId}`);
     const setData = await response.json();
     set.value = setData.data;
 
@@ -361,7 +361,7 @@ const openBooster = async () => {
     // Opening booster for set
 
     // Call backend API to open booster
-    const response = await fetch(`http://localhost:3000/cards/booster-pack/open`, {
+    const response = await fetch(`https://backend.cardthemall.fr/cards/booster-pack/open`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

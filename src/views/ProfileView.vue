@@ -310,7 +310,7 @@ const updateProfile = async () => {
   isUpdating.value = true;
 
   try {
-    const response = await fetch(`http://localhost:3000/user/${authStore.user.id}`, {
+    const response = await fetch(`https://backend.cardthemall.fr/user/${authStore.user.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -354,7 +354,7 @@ const changePassword = async () => {
   isChangingPassword.value = true;
 
   try {
-    const response = await fetch(`http://localhost:3000/user/${authStore.user.id}`, {
+    const response = await fetch(`https://backend.cardthemall.fr/user/${authStore.user.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -391,7 +391,7 @@ const deleteAccount = async () => {
 
   try {
     // First verify password by trying to login
-    const loginResponse = await fetch('http://localhost:3000/auth/login', {
+    const loginResponse = await fetch('https://backend.cardthemall.fr/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -408,7 +408,7 @@ const deleteAccount = async () => {
     }
 
     // If password is correct, proceed with deletion
-    const deleteResponse = await fetch(`http://localhost:3000/user/${authStore.user.id}`, {
+    const deleteResponse = await fetch(`https://backend.cardthemall.fr/user/${authStore.user.id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${authStore.accessToken}`,

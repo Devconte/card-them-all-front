@@ -337,7 +337,7 @@ const fetchStats = async () => {
   if (!authStore.isAuthenticated) return;
 
   try {
-    const response = await fetch('http://localhost:3000/collections/stats', {
+    const response = await fetch('https://backend.cardthemall.fr/collections/stats', {
       headers: {
         Authorization: `Bearer ${authStore.accessToken}`,
       },
