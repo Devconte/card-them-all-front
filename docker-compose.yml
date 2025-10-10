@@ -4,17 +4,11 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
-    # container_name: cardthemall-frontend
+    ports:
+      - '5173:5173'
     networks:
-      - public-net
-    # Si tu veux que nginx puisse l'atteindre via "cardthemall-frontend", ajoute un alias :
-    network_mode: ""  # ignore; juste pour signaler que below is networks config
-    # networks:
-    #   public-net:
-    #     aliases:
-    #       - cardthemall-frontend
-
+      - app-network   
 networks:
-  public-net:
-    driver: host
-    name: card-them-all-shared-network
+  app-network:
+    name: card-them-all-front_app-network
+    external: true 
