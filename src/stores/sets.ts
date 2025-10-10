@@ -35,7 +35,7 @@ export const useSetsStore = defineStore('sets', () => {
   // Check if a set has cards with images by fetching the cards
   const hasCardsWithImages = async (setId: string): Promise<boolean> => {
     try {
-      const response = await fetch((import.meta.env.VITE_API_URL || "http://localhost:3000") + "/cards/sets/" + setId);
+      const response = await fetch((import.meta.env.VITE_API_URL || "https://backend.cardthemall.fr") + "/cards/sets/" + setId);
       if (!response.ok) return false;
 
       const data = await response.json();

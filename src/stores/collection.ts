@@ -40,7 +40,7 @@ export const useCollectionStore = defineStore('collection', () => {
         throw new Error('Non authentifié');
       }
 
-      const response = await axios.get((import.meta.env.VITE_API_URL || "http://localhost:3000") + "/collections", {
+      const response = await axios.get((import.meta.env.VITE_API_URL || "https://backend.cardthemall.fr") + "/collections", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

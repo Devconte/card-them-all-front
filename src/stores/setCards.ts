@@ -44,7 +44,7 @@ export const useSetCardsStore = defineStore('setCards', () => {
     state.value[setId].error = null;
 
     try {
-      const response = await fetch((import.meta.env.VITE_API_URL || "http://localhost:3000") + "/cards/sets/" + setId);    
+      const response = await fetch((import.meta.env.VITE_API_URL || "https://backend.cardthemall.fr") + "/cards/sets/" + setId);    
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
