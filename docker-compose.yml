@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: frontend
     restart: unless-stopped
     ports:
       - "3001:3001"
@@ -11,4 +12,4 @@ services:
 networks:
   app-network:
     name: card-them-all-front_app-network
-    driver: bridge 
+    driver: bridge
