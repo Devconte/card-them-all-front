@@ -4,7 +4,7 @@
     
     # Copier les deps et installer
     COPY package.json package-lock.json ./
-    RUN npm ci
+    RUN npm install --include=dev
     
     # Copier le code et builder
     COPY . .
