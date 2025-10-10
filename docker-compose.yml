@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile   
     restart: unless-stopped
     container_name: cardthemall-frontend
+    # Pas de ports exposés - le nginx du backend fait le proxy
     networks:
       - app-network
       - frontend-network
