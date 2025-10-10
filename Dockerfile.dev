@@ -1,0 +1,22 @@
+# Dockerfile pour le développement
+FROM --platform=linux/amd64 node:20-alpine
+
+WORKDIR /app
+
+# Installer les dépendances système nécessaires
+RUN apk add --no-cache git
+
+# Copier les fichiers package
+COPY package.json package-lock.json ./
+
+# Installer les dépendances
+RUN npm ci
+
+# Copier le reste des fichiers
+COPY . .
+
+# Exposer le port 5173 (Vite dev server)
+EXPOSE 5173
+
+# Démarrer le serveur de développement Vite
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
