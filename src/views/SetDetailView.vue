@@ -244,18 +244,14 @@ const selectedRarities = ref<string[]>([]);
 
 // Booster Modal State
 const isBoosterModalOpen = ref(false);
-// Type for BoosterModal cards (simplified version of Card)
-interface BoosterCard {
-  id: string;
-  name: string;
-  image: string;
-  rarity?: {
-    name: string;
-  };
-  revealed?: boolean;
-}
+const boosterCards = ref<Card[]>([]);
 
-const boosterCards = ref<BoosterCard[]>([]);
+// Card Details Modal State
+const selectedCard = ref<Card | null>(null);
+const isCardDetailsOpen = ref(false);
+
+// Mobile Filters State
+const isMobileFiltersOpen = ref(false);
 
 // Computed from store
 const cards = computed(() => setCardsStore.getSetCards(route.params.id as string));
@@ -399,10 +395,8 @@ const openBooster = async () => {
 
     // Prepare cards for modal with optimized images
     const cardsWithImages = cards.map((card: Card) => ({
-      id: card.id,
-      name: card.name,
+      ...card,
       image: getCardImage(card) || '/placeholder.png', // Ensure image is always a string
-      rarity: card.rarity,
       revealed: false,
     }));
 
