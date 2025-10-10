@@ -6,20 +6,9 @@ WORKDIR /app
 # Copy package files
 COPY package.json package-lock.json ./
 
-# Install dependencies
-<<<<<<< HEAD
-RUN npm install
-
-# Copy project files
-COPY . .
-
-# Expose port for development
-EXPOSE 5173
-
-# Start development server
-CMD ["npm", "run", "dev"]
-=======
-RUN npm ci
+# Install dependencies with workaround for rollup musl issue
+RUN rm -rf node_modules package-lock.json && \
+    npm install
 
 # Copy all project files
 COPY . .
